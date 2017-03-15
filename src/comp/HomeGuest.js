@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
-import {Text,TextInput,View,Image,Button,Picker,Item,AppRegistry} from 'react-native';
+import {Text,TouchableHighlight,TextInput,View,Image,Button,Picker,Item,AppRegistry} from 'react-native';
 export default class HomeGuest extends Component{
-  
+
   render(){
     return(
       <View>
@@ -13,16 +13,58 @@ export default class HomeGuest extends Component{
         </View>
         <View style={{flexDirection:'row'}}>
           <TextInput style={{width:150}} placeholder="tìm kiếm"/>
-<Text onPress={()=>this.btn_TimKiem()} style={{width:100,height:30}}>
-<Image source={require('../img/icondefault.jpg')}/>
-</Text>
+<TouchableHighlight onPress={()=>this.btn_TimKiem()}>
+<Image source={require('../img/icondefault.jpg')} style={{width:25,height:25}}/>
+</TouchableHighlight>
 
         </View>
-
+          <View style={{flexDirection:'row'}}>
+              <TouchableHighlight onPress={()=>this.btn_RauCu()}>
+              <View>
+                <Image source={require('../img/icondefault.jpg')}/>
+                <Text>Rau Cu</Text>
+              </View>
+              </TouchableHighlight>
+              <TouchableHighlight onPress={()=>this.btn_RauCu()}>
+              <View>
+                <Image source={require('../img/icondefault.jpg')}/>
+                <Text>Rau Cu</Text>
+              </View>
+              </TouchableHighlight>
+              <TouchableHighlight onPress={()=>this.btn_RauCu()}>
+              <View>
+                <Image source={require('../img/icondefault.jpg')}/>
+                <Text>Rau Cu</Text>
+              </View>
+              </TouchableHighlight>
+          </View>
+          <View style={{flexDirection:'row'}}>
+              <TouchableHighlight onPress={()=>this.btn_RauCu()}>
+              <View>
+                <Image source={require('../img/icondefault.jpg')}/>
+                <Text>Rau Cu</Text>
+              </View>
+              </TouchableHighlight>
+              <TouchableHighlight onPress={()=>this.btn_RauCu()}>
+              <View>
+                <Image source={require('../img/icondefault.jpg')}/>
+                <Text>Rau Cu</Text>
+              </View>
+              </TouchableHighlight>
+              <TouchableHighlight onPress={()=>this.btn_RauCu()}>
+              <View>
+                <Image source={require('../img/icondefault.jpg')}/>
+                <Text>Rau Cu</Text>
+              </View>
+              </TouchableHighlight>
+          </View>
 
       </View>
 
     );
+  }
+  btn_RauCu(){
+    alert('btn rau cu dc click');
   }
   btn_DangNhap(){
     alert('button dang nhap duoc click');

@@ -4,50 +4,12 @@
  * @flow
  */
 
-import React, { Component } from 'react';
+import React,{Component} from 'react';
 import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View
+  AppRegistry
 } from 'react-native';
-
-export default class ChoNhaNong_v1 extends Component {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.android.js
-        </Text>
-        <Text style={styles.instructions}>
-          Double tap R on your keyboard to reload,{'\n'}
-          Shake or press menu button for dev menu
-        </Text>
-      </View>
-    );
-  }
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-});
-
-AppRegistry.registerComponent('ChoNhaNong_v1', () => ChoNhaNong_v1);
+//import HomeGuest from './src/comp/HomeGuest';
+//import FirstDisplay from './src/comp/FirstDisplay';
+//import Login from './src/comp/Login';
+import Register from './src/comp/Register';
+AppRegistry.registerComponent('ChoNhaNong_v1', () => Register);

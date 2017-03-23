@@ -10,9 +10,12 @@ import {
 } from 'react-native';
 //import HomeGuest from './src/comp/HomeGuest';
 //import ItemListViewStatus from './src/item_customer/ItemListViewStatus';
-import GuestMain from './src/comp/GuestMain';
-
+//import GuestMain from './src/comp/GuestMain';
+import InfoPersonal from './src/comp/InfoPersonal';
+//import Messendger from './src/comp/Messendger';
+//import StatusDetail from './src/comp/StatusDetail';
+//import ItemCommand from './src/item_customer/ItemCommand';
 //import FirstDisplay from './src/comp/FirstDisplay';
 //import Login from './src/comp/Login';
 //import Register from './src/comp/Register';
-AppRegistry.registerComponent('ChoNhaNong_v1', ()=> GuestMain);
+AppRegistry.registerComponent('ChoNhaNong_v1', ()=>InfoPersonal);

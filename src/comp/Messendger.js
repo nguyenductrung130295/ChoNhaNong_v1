@@ -29,16 +29,21 @@ export default class Messendger extends Component{
   }
   render(){
     return(
-      <View>
-        <View>
+      <View style={{flex:1}}>
+        <View style={{flex:9}}>
         <ListView
         dataSource={this.state.dataSource}
         renderRow={(rowData)=><ItemInbox inbox={rowData}/>}
         />
-
-          <TextInput onChangeText={(value)=>this.setState({text:value})}/>
-          <TouchableHighlight onPress={()=>alert('send '+this.state.text)}><Image source={require('../img/icondefault.jpg')} style={{height:10,width:10}}/>
-          </TouchableHighlight>
+      </View>
+      <View style={{flex:1,flexDirection:'row'}}>
+        <View style={{flex:7}}>
+        <TextInput returnKeyType="send" onChangeText={(value)=>this.setState({text:value})} onSubmitEditing={()=>alert('send')}/>
+        </View>
+        <View style={{flex:1}}>
+        <TouchableHighlight onPress={()=>alert('send '+this.state.text)}><Image source={require('../img/icondefault.jpg')} style={{height:25,width:25}}/>
+        </TouchableHighlight>
+        </View>
         </View>
 
       </View>

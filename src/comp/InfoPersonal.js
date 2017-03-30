@@ -1,6 +1,6 @@
 import React,{Component} from 'react';
 import {AppRegistry,View,Image,Text,TouchableHighlight,ListView} from 'react-native';
-
+import ItemListViewStatus from '../item_customer/ItemListViewStatus';
 export default class InfoPersonal extends Component{
   constructor(props){
     super(props);
@@ -25,7 +25,9 @@ export default class InfoPersonal extends Component{
     const ds=new ListView.DataSource({rowHasChanged:(r1,r2) => r1 !== r2});
     this.state={
       dataSource:ds.cloneWithRows(data),
-      imgyes:false
+      imgyes:false,
+      options:1,//1:bài đăng,2:thông tin,3:ảnh
+      mysefl:false,//false: là khách xem ,true: là ban than ca nhan ho xem minh
     }
   }
   yesImg(){
@@ -39,6 +41,7 @@ export default class InfoPersonal extends Component{
       );
     }
   }
+
   render(){
     return(
       <View style={{flex:1}}>
@@ -53,26 +56,142 @@ export default class InfoPersonal extends Component{
             <Image style={{width:100,height:100}} source={require('../img/ngoctam.jpg')}/>
             <Text>Trần Thị Ngọc Tâm
             </Text>
+            {this.ShowInboxButton()}
           </Image>
           <View style={{flexDirection:'row'}}>
-            <View style={{flex:1,backgroundColor:'yellow'}}><Text>BÀI ĐĂNG</Text></View>
-            <View style={{flex:1,backgroundColor:'green'}}><Text>THÔNG TIN</Text></View>
-            <View style={{flex:1,backgroundColor:'green'}}><Text>ẢNH</Text></View>
+            <View style={{flex:1,backgroundColor:'yellow'}}><Text onPress={()=>this.btn_ShowTabBaiDang()}>BÀI ĐĂNG</Text></View>
+            <View style={{flex:1,backgroundColor:'green'}}><Text onPress={()=>this.btn_ShowTabThongTin()}>THÔNG TIN</Text></View>
+            <View style={{flex:1,backgroundColor:'green'}}><Text onPress={()=>this.btn_ShowTabAnh()}>ẢNH</Text></View>
           </View>
         </View>
 
         <View style={{flex:2}}>
-        <ListView
-          dataSource={this.state.dataSource}
-          renderRow={(rowData)=><ItemListViewStatus obj={rowData}
+        <View style={{marginTop:20}}>
+{this._renderOptions()}
+        </View>
 
-          ></ItemListViewStatus>}
-        />
-        </View>        
+
+        </View>
 
 
       </View>
     );
+  }
+  _renderOptions(){
+    switch (this.state.options) {
+      case 1:
+          return(
+            <View>
+            <ListView
+              dataSource={this.state.dataSource}
+              renderRow={(rowData)=><ItemListViewStatus obj={rowData}
+
+              ></ItemListViewStatus>}
+            />
+
+            </View>
+          );
+        break;
+      case 2:
+      return(
+        <View>
+        <TouchableHighlight>
+          <View style={{flexDirection:'row'}}>
+            <Image source={require('../img/thaole.jpg')} style={{width:15,height:15}}/>
+            <Text>Thảo Lê</Text>
+          </View>
+        </TouchableHighlight>
+        <TouchableHighlight>
+          <View style={{flexDirection:'row'}}>
+            <Image source={require('../img/thaole.jpg')} style={{width:15,height:15}}/>
+            <Text>0987654321</Text>
+          </View>
+        </TouchableHighlight>
+        <TouchableHighlight>
+          <View style={{flexDirection:'row'}}>
+            <Image source={require('../img/thaole.jpg')} style={{width:15,height:15}}/>
+            <Text>Xuân Nam-Diên Xuân -Diên Khánh-Khánh Hòa</Text>
+          </View>
+        </TouchableHighlight>
+        <TouchableHighlight>
+          <View style={{flexDirection:'row'}}>
+            <Image source={require('../img/thaole.jpg')} style={{width:15,height:15}}/>
+            <Text>Lời giới thiệu</Text>
+          </View>
+        </TouchableHighlight>
+
+
+
+          <Text>Cửa hàng sở hữu</Text>
+
+          <TouchableHighlight>
+            <View style={{flexDirection:'row'}}>
+              <Image source={require('../img/thaole.jpg')} style={{width:15,height:15}}/>
+              <Text>Bưởi 5 roi chị Sáu</Text>
+            </View>
+          </TouchableHighlight>
+          <TouchableHighlight>
+            <View style={{flexDirection:'row'}}>
+              <Image source={require('../img/thaole.jpg')} style={{width:15,height:15}}/>
+              <Text>Bắm cao sản siêu cứng</Text>
+            </View>
+          </TouchableHighlight>
+          <TouchableHighlight>
+            <View style={{flexDirection:'row'}}>
+              <Image source={require('../img/thaole.jpg')} style={{width:15,height:15}}/>
+              <Text>Sầu riêng ko ruột</Text>
+            </View>
+          </TouchableHighlight>
+          <TouchableHighlight>
+            <View style={{flexDirection:'row'}}>
+              <Image source={require('../img/thaole.jpg')} style={{width:15,height:15}}/>
+              <Text>Ớt to cho chị em</Text>
+            </View>
+          </TouchableHighlight>
+
+        </View>
+      );
+      break;
+      case 3:
+      return(
+        <View>
+          <Text>3
+          </Text>
+        </View>
+      );
+      break;
+    };
+  }
+  ShowInboxButton(){
+    if(this.state.mysefl){
+      return(
+        <View>
+          <Text>ShowModalButtonFloat,EditInfor</Text>
+        </View>
+      );
+
+    }else{
+      return(
+        <View>
+          <Text onPress={()=>this.btn_SendMessage()}>Gửi tin nhắn
+          </Text>
+        </View>
+      );
+    }
+  }
+  btn_SendMessage(){
+    this.props.propsNavigator.push({
+      screen:'Messendger'
+    })
+  }
+  btn_ShowTabBaiDang(){
+    this.setState({options:1});
+  }
+  btn_ShowTabThongTin(){
+this.setState({options:2});
+  }
+  btn_ShowTabAnh(){
+this.setState({options:3});
   }
 }
 AppRegistry.registerComponent('Component_API_Demo',()=>InfoPersonal);

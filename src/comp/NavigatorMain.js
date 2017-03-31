@@ -9,6 +9,7 @@ import Register from './Register'
 import InfoPersonal from './InfoPersonal'
 import Messendger from './Messendger'
 import AddPostNew from './AddPostNew'
+import ShopMain from './ShopMain'
 export default class NavigatorChuyenTrang extends Component{
 
   _renderScene(route,navigator){
@@ -16,6 +17,9 @@ export default class NavigatorChuyenTrang extends Component{
     let data=route.datanavi;
     switch (name) {
       // hiển thị trang đầu tiên, chọn mua hoặc bán
+      case 'ShopMain':
+        return <ShopMain propsNavigator={navigator}/>
+        break;
       case 'AddPostNew':
           return <AddPostNew propsNavigator={navigator}/>
           break;
@@ -48,7 +52,7 @@ export default class NavigatorChuyenTrang extends Component{
     //initialRoute là màn hình chạy đầu tiên
     return(
       <Navigator
-        initialRoute={{screen:'AddPostNew'}}
+        initialRoute={{screen:'ShopMain'}}
         renderScene={this._renderScene.bind(this)}
       />
     );

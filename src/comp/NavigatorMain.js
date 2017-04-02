@@ -52,7 +52,7 @@ export default class NavigatorChuyenTrang extends Component{
     //initialRoute là màn hình chạy đầu tiên
     return(
       <Navigator
-        initialRoute={{screen:'ShopMain'}}
+        initialRoute={{screen:'AddPostNew'}}
         renderScene={this._renderScene.bind(this)}
       />
     );

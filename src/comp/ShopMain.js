@@ -174,11 +174,15 @@ Hạnh phúc chỉ thế thôi ....Là em
       return(
         <View>
           <Text>Import item ds người đang theo dỏi cửa hàng
+          {this.ShowUsers()}
           </Text>
         </View>
       );
       break;
     };
+  }
+  ShowUsers(){
+
   }
   btn_ShowTabSuKien(){
 this.setState({options:4});

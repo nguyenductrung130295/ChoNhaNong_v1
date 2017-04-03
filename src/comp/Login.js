@@ -7,34 +7,33 @@ export default class Login extends Component {
 
   render(){
     return(
-      <View style={{flex:1,backgroundColor:'#eeeeee'}}>
-      <View style={{flex:5}}>
-        <Image source={require('../img/thaole.jpg')} style={{width:'100%',height:'100%'}}>
-          <TouchableHighlight onPress={()=>this.btn_BackScreen_Click()}><Image source={require('../img/ic_search_black_24dp.png')} style={{width:40,height:40,marginTop:5}}/></TouchableHighlight>
+      <View style={{flex:1,backgroundColor:'#B3E5FC'}}>
+      <View style={{flex:1}}>
+        <View style={{margin:5}}>
+        <Image source={require('../img/logo1.png')} style={{width:'100%',height:'100%'}} resizeMode="contain">
+          <TouchableHighlight style={{width:40,height:40,borderRadius:40}} onPress={()=>this.btn_BackScreen_Click()} underlayColor={'#E1F5FE'}>
+          <Image source={require('../img/ic_clear_white_24dp.png')} style={{width:40,height:40,marginTop:5}}/></TouchableHighlight>
         </Image>
-      </View>
-      <View style={{flex:4}}>
+        </View>
 
-      <TextInput placeholder="số điện thoại"/>
-      <TextInput placeholder="mật khẩu" secureTextEntry={true} onSubmitEditing={()=>this.btn_DangNhap_Click()}/>
-      <Button onPress={()=>this.btn_DangNhap_Click()} title={'Đăng nhập'} color='green'></Button>
-      <Text>{"\n"}
-      </Text>
-      <Text onPress={()=>this.btn_DangKy_Click()} color="red"> Đăng ký tài khoản mới
-      </Text>
       </View>
-      <View style={{flex:1,flexDirection:'row'}}>
-      {/*
-        <View style={{flex:1}}>
-          <Button title="Facebook" onPress={()=>this.btn_WithFacebook_Click()} color='blue'></Button>
+      <View style={{flex:1}}>
+      <View style={{margin:15}}>
+        <Text style={{fontWeight:'bold',fontSize:20,color:'#01579B'}}>Số điện thoại:</Text>
+        <TextInput placeholder="số điện thoại" style={{borderRadius:5,backgroundColor:'white',fontSize:20}} underlineColorAndroid="white"/>
+
+        <View style={{flexDirection:'row',marginTop:7}}>
+          <View style={{flex:1}}><Text style={{fontWeight:'bold',fontSize:20,color:'#01579B',marginTop:7}}>Mật khẩu:</Text></View>
+          <View style={{flex:2,alignItems:'flex-end'}}><Text style={{fontStyle:'italic',marginTop:7,fontSize:15,color:'#FF9800'}}>Quên mật khẩu?</Text></View>
         </View>
-        <View style={{flex:1}}>
-          <Button title="Google" onPress={()=>this.btn_WithGoogle_Click()} color='pink'></Button>
-        </View>
-        <View style={{flex:1}}>
-          <Button title="Đăng ký" onPress={()=>this.btn_DangKy_Click()} color='yellow'></Button>
-        </View>
-        */}
+
+        <TextInput placeholder="mật khẩu" secureTextEntry={true} onSubmitEditing={()=>this.btn_DangNhap_Click()} style={{borderRadius:5,backgroundColor:'white',fontSize:20}} underlineColorAndroid="white"/>
+        <Text>{"\n"}</Text>
+        <Button onPress={()=>this.btn_DangNhap_Click()} title={'Đăng nhập'} color='#03A9F4'></Button>
+<Text>{"\n"}</Text>
+        <View style={{alignItems:'flex-end'}}>
+        <Text onPress={()=>this.btn_DangKy_Click()}  style={{fontStyle:'italic',marginTop:7,fontSize:20,color:'#FF9800'}}> Đăng ký tài khoản mới</Text></View>
+      </View>
       </View>
       </View>
     );

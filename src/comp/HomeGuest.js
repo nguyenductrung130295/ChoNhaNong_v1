@@ -42,6 +42,35 @@ export default class HomeGuest extends Component{
     return(
 
       <View style={styles.container}>
+      <View style={{backgroundColor:'#2196F3'}}>
+      <View style={{flexDirection:'row'}}>
+        <View style={{flex:6,paddingLeft:5}}>
+        <TextInput underlineColorAndroid="#64B5F6" style={{color:'white',backgroundColor:'#64B5F6',borderRadius:5,height:38,fontSize:15,marginTop:5}} returnKeyType={'search'} placeholder="search" onSubmitEditing={()=>this.btn_TimKiem_Click()}/>
+        </View>
+        <View style={{flex:1}}><TouchableHighlight onPress={()=>this.btn_TimKiem_Click()}><Image source={require('../img/ic_search_black_24dp.png')} style={{width:40,height:40,marginTop:5}}/></TouchableHighlight></View>
+        <View style={{flex:1}}><TouchableHighlight underlayColor='pink' onPress={()=>this.btn_DangNhap_Click()}><Image source={require('../img/ic_account_circle_black_24dp.png')} style={{width:40,height:40,marginTop:5}}/></TouchableHighlight></View>
+      </View>
+      <View style={{flexDirection:'row'}}>
+        <View style={{flex:3}}>
+        <Picker selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
+          {this.renderItemBan()}
+        </Picker>
+        </View>
+        <View style={{flex:4}}>
+        <Picker mode='dropdown' selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
+          {this.renderItemLoai()}
+        </Picker>
+        </View>
+        <View style={{flex:5}}>
+        <Picker selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
+          {this.renderItemTinh()}
+        </Picker>
+        </View>
+      </View>
+      </View>
+
+
+
       {/*
       <View style={styles.actionbar}>
         <View style={{flex:1}}><Image source={require('../img/ic_view_headline_black_24dp.png')} style={{width:40,height:40,marginTop:5,marginLeft:5}}/></View>
@@ -77,34 +106,9 @@ export default class HomeGuest extends Component{
 
         </View>
         */}
-        <View>
-        <View style={{flexDirection:'row'}}>
-          <View style={{flex:6}}>
-          <TextInput returnKeyType={'search'} placeholder="search" onSubmitEditing={()=>this.btn_TimKiem_Click()}/>
-          </View>
-          <View style={{flex:1}}><TouchableHighlight onPress={()=>this.btn_TimKiem_Click()}><Image source={require('../img/ic_search_black_24dp.png')} style={{width:40,height:40,marginTop:5}}/></TouchableHighlight></View>
-          <View style={{flex:1}}><TouchableHighlight underlayColor='pink' onPress={()=>this.btn_DangNhap_Click()}><Image source={require('../img/ic_account_circle_black_24dp.png')} style={{width:40,height:40,marginTop:5}}/></TouchableHighlight></View>
-        </View>
-        <View style={{flexDirection:'row'}}>
-          <View style={{flex:3}}>
-          <Picker selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
-            {this.renderItemBan()}
-          </Picker>
-          </View>
-          <View style={{flex:4}}>
-          <Picker mode='dropdown' selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
-            {this.renderItemLoai()}
-          </Picker>
-          </View>
-          <View style={{flex:5}}>
-          <Picker selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
-            {this.renderItemTinh()}
-          </Picker>
-          </View>
-        </View>
-        </View>
 
 
+<View style={{padding:10}}>
           <Text>DANH MỤC SẢN PHẨM</Text>
           <View style={{flexDirection:'row'}}>
           <View style={{marginLeft:5,marginRight:5,borderWidth:1,borderColor:'#dbdbdb',borderRadius:3}}>
@@ -136,6 +140,7 @@ export default class HomeGuest extends Component{
             <Text>Rau Cu</Text>
           </View>
           </View>
+</View>
 
       </View>
 
@@ -155,7 +160,7 @@ export default class HomeGuest extends Component{
 }
 var styles=StyleSheet.create({
   container:{
-    backgroundColor:'#eeeeee',
+    backgroundColor:'#E1F5FE',
     flex:1
   },
   actionbar:{

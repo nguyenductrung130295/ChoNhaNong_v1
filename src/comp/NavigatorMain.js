@@ -52,7 +52,11 @@ export default class NavigatorChuyenTrang extends Component{
     //initialRoute là màn hình chạy đầu tiên
     return(
       <Navigator
+<<<<<<< HEAD
         initialRoute={{screen:'HomeGuest'}}
+=======
+        initialRoute={{screen:'AddPostNew'}}
+>>>>>>> a6ea4500df3b0887560a713805b8596d17a8c522
         renderScene={this._renderScene.bind(this)}
       />
     );

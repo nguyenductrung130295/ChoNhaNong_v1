@@ -69,8 +69,8 @@ export default class GuestMain extends Component{
         <View style={{flex:6}}>
         <TextInput returnKeyType={'search'} placeholder="search" onSubmitEditing={()=>this.btn_TimKiem_Click()}/>
         </View>
-        <View style={{flex:1}}><TouchableHighlight onPress={()=>this.btn_TimKiem_Click()}><Image source={require('../img/ic_search_black_24dp.png')} style={{width:40,height:40,marginTop:5}}/></TouchableHighlight></View>
-        <View style={{flex:1}}><TouchableHighlight underlayColor='pink' onPress={()=>this.btn_DangNhap_Click()}><Image source={require('../img/ic_account_circle_black_24dp.png')} style={{width:40,height:40,marginTop:5}}/></TouchableHighlight></View>
+        <View style={{flex:1}}><TouchableHighlight onPress={()=>this.btn_TimKiem_Click()}><Image source={require('../img/ic_search_white_24dp.png')} style={{width:40,height:40,marginTop:5}}/></TouchableHighlight></View>
+        <View style={{flex:1}}><TouchableHighlight underlayColor='pink' onPress={()=>this.btn_DangNhap_Click()}><Image source={require('../img/ic_person_white_24dp.png')} style={{width:40,height:40,marginTop:5}}/></TouchableHighlight></View>
 
         </View>
 
@@ -84,7 +84,7 @@ export default class GuestMain extends Component{
         <View style={{flex:6}}>
         <TextInput returnKeyType={'search'} placeholder="search" onSubmitEditing={()=>this.btn_TimKiem_Click()}/>
         </View>
-        <View style={{flex:1}}><TouchableHighlight onPress={()=>this.btn_TimKiem_Click()}><Image source={require('../img/ic_search_black_24dp.png')} style={{width:40,height:40,marginTop:5}}/></TouchableHighlight></View>
+        <View style={{flex:1}}><TouchableHighlight onPress={()=>this.btn_TimKiem_Click()}><Image source={require('../img/ic_search_white_24dp.png')} style={{width:40,height:40,marginTop:5}}/></TouchableHighlight></View>
         <View style={{flex:1}}>
           <TouchableHighlight onPress={()=>this.btn_TimKiem_Click()}>
             <Image source={require('../img/ic_notifications_none_black_24dp.png')} style={{width:40,height:40,marginTop:5}}>

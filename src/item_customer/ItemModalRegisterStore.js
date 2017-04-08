@@ -3,10 +3,13 @@ import { Modal, Text, TouchableHighlight, View, Image,TextInput,
 Picker,Button } from 'react-native';
 
 export default class ItemModalRegisterStore extends Component {
-
-  state = {
-    modalVisible: false,
+  constructor(props){
+    super(props);
+    this.state = {
+      modalVisible: false,
+    };
   }
+
 
   setModalVisible(visible) {
     this.setState({modalVisible: visible});

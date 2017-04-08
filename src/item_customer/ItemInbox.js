@@ -16,7 +16,7 @@ export default class ItemInbox extends Component{
   renderhaha1(){
     if(this.state.flag){
       return(
-        <Text style={{color:'red'}}>-{this.props.inbox.time}-</Text>
+        <Text style={{color:'white',fontSize:12,marginLeft:40}}>{"\n\n     "}{this.props.inbox.time}</Text>
       );
     }else{
       return null;
@@ -26,29 +26,41 @@ export default class ItemInbox extends Component{
     if(this.props.inbox.own){
       return(
         <View>
-          <View style={{flexDirection:'row'}}>
-            <TouchableHighlight onPress={()=>this.xemTime()}><Text>i:{this.props.inbox.contents}
+          <View style={{flexDirection:'row',marginTop:5}}>
+          <View style={{flex:2}}>
+          </View>
+            <View style={{flex:5,backgroundColor:'#4FC3F7',borderRadius:10,padding:5}}>
+            <TouchableHighlight onPress={()=>this.xemTime()}><Text style={{fontSize:17,color:'black'}}>i:{this.props.inbox.contents}
             {this.renderhaha1()}
             </Text>
             </TouchableHighlight>
-            <TouchableHighlight onPress={()=>this.accessUser()}><Image source={require('../img/icondefault.jpg')} style={{height:20,width:20}}/>
+            </View>
+            <View style={{flex:1,marginLeft:5}}>
+            <TouchableHighlight onPress={()=>this.accessUser()}><Image source={require('../img/icondefault.jpg')} style={{height:40,width:40,borderRadius:100}}/>
             </TouchableHighlight>
+            </View>
           </View>
         </View>
       );
     }else{
       return(
-        <View>
-          <View style={{flexDirection:'row'}}>
-            <TouchableHighlight onPress={()=>this.accessUser()}><Image source={require('../img/icondefault.jpg')} style={{height:20,width:20}}/>
+
+          <View style={{flexDirection:'row',marginTop:5}}>
+            <View style={{flex:1}}>
+            <TouchableHighlight onPress={()=>this.accessUser()}><Image source={require('../img/icondefault.jpg')} style={{height:40,width:40,borderRadius:100,marginLeft:5}}/>
             </TouchableHighlight>
-            <TouchableHighlight onPress={()=>this.xemTime()}><Text>i:{this.props.inbox.contents}
+            </View>
+            <View style={{flex:5,backgroundColor:'#9E9E9E',borderRadius:10,padding:5}}>
+            <TouchableHighlight onPress={()=>this.xemTime()}>
+            <Text style={{fontSize:17,color:'white'}}>{this.props.inbox.contents}
             {this.renderhaha1()}
             </Text>
 
             </TouchableHighlight>
+            </View>
+            <View style={{flex:2}}>
+            </View>
           </View>
-        </View>
       );
     }
 

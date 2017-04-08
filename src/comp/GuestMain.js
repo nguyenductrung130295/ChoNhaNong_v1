@@ -18,6 +18,46 @@ export default class GuestMain extends Component{
 
       },
       {
+        title:"Dinh Khung",
+        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
+        price:"120000",
+        time:"12-2-2017 15:00",
+        address:"Khanh Hoa"
+
+      },
+      {
+        title:"Dinh Khung",
+        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
+        price:"120000",
+        time:"12-2-2017 15:00",
+        address:"Khanh Hoa"
+
+      },
+      {
+        title:"Trung Khung",
+        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
+        price:"120000",
+        time:"12-2-2017 15:00",
+        address:"Khanh Hoa"
+
+      },
+      {
+        title:"Trung Khung",
+        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
+        price:"120000",
+        time:"12-2-2017 15:00",
+        address:"Khanh Hoa"
+
+      },
+      {
+        title:"Trung Khung",
+        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
+        price:"120000",
+        time:"12-2-2017 15:00",
+        address:"Khanh Hoa"
+
+      },
+      {
         title:"Trung Khung",
         imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
         price:"120000",
@@ -65,13 +105,40 @@ export default class GuestMain extends Component{
     var t=true;
     if(!t){
       return(
+        <View style={{backgroundColor:'#03A9F4'}}>
         <View style={{flexDirection:'row'}}>
-        <View style={{flex:6}}>
-        <TextInput returnKeyType={'search'} placeholder="search" onSubmitEditing={()=>this.btn_TimKiem_Click()}/>
+          <View style={{flex:7,paddingLeft:5}}>
+{/* SEARCH INPUT */}
+          <TextInput underlineColorAndroid="#29b6f6" style={{color:'white',borderColor:'#81D4FA',borderWidth:1,backgroundColor:'#29b6f6',borderRadius:5,height:38,fontSize:15,marginTop:5}} returnKeyType={'search'} placeholder="  search" onSubmitEditing={()=>this.btn_TimKiem_Click()}/>
+          </View>
+{/* ICON BUTTON SEARCH */}
+          <View style={{flex:1}}><TouchableHighlight underlayColor='#E0F7FA' onPress={()=>this.btn_TimKiem_Click()} style={{width:40,height:40,marginTop:5,borderRadius:20}}><Image source={require('../img/ic_search_white_24dp.png')} /></TouchableHighlight></View>
+{/* ICON BUTTON ACCOUNT */}
+          <View style={{flex:1}}><TouchableHighlight underlayColor='#E0F7FA' onPress={()=>this.btn_DangNhap_Click()} style={{width:40,height:40,marginTop:5,borderRadius:20}}><Image source={require('../img/ic_person_white_24dp.png')} /></TouchableHighlight></View>
         </View>
-        <View style={{flex:1}}><TouchableHighlight onPress={()=>this.btn_TimKiem_Click()}><Image source={require('../img/ic_search_white_24dp.png')} style={{width:40,height:40,marginTop:5}}/></TouchableHighlight></View>
-        <View style={{flex:1}}><TouchableHighlight underlayColor='pink' onPress={()=>this.btn_DangNhap_Click()}><Image source={require('../img/ic_person_white_24dp.png')} style={{width:40,height:40,marginTop:5}}/></TouchableHighlight></View>
-
+        <View style={{flexDirection:'row',marginTop:5,marginBottom:5}}>
+{/* PICKER BÁN MUA */}
+          <View style={{flex:3}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
+          <Picker style={{color:'white',height:30}} selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
+            {this.renderItemBan()}
+          </Picker></View>
+          </View>
+{/* PICKER LOẠI */}
+          <View style={{flex:4}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
+          <Picker style={{color:'white',height:30}} mode='dropdown' selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
+            {this.renderItemLoai()}
+          </Picker></View>
+          </View>
+{/* PICKER TỈNH THÀNH PHỐ */}
+          <View style={{flex:5}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',marginRight:5,borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
+          <Picker style={{color:'white',height:30}}rr selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
+            {this.renderItemTinh()}
+          </Picker></View>
+          </View>
+        </View>
+        <View style={{height:1,backgroundColor:'#9E9E9Ed4'}}></View>
+        <View style={{height:2,backgroundColor:'#BDBDBDc4'}}></View>
+        <View style={{height:2,backgroundColor:'#E0E0E0'}}></View>
         </View>
 
       );
@@ -79,19 +146,44 @@ export default class GuestMain extends Component{
     }
     else{
       return (
+        <View>
+        <View style={{backgroundColor:'#03A9F4'}}>
         <View style={{flexDirection:'row'}}>
-        <View style={{flex:1}}><TouchableHighlight underlayColor='pink' onPress={()=>this.btn_Menu_Click()}><Image source={require('../img/ic_view_headline_black_24dp.png')} style={{width:40,height:40,marginTop:5}}/></TouchableHighlight></View>
-        <View style={{flex:6}}>
-        <TextInput returnKeyType={'search'} placeholder="search" onSubmitEditing={()=>this.btn_TimKiem_Click()}/>
+          <View style={{flex:1}}><TouchableHighlight underlayColor='#E0F7FA' onPress={()=>this.btn_Menu_Click()} style={{width:40,height:40,marginTop:5,borderRadius:20}}><Image source={require('../img/ic_reorder_white_24dp.png')} /></TouchableHighlight></View>
+          <View style={{flex:7,paddingLeft:5}}>
+{/* SEARCH INPUT */}
+          <TextInput underlineColorAndroid="#29b6f6" style={{color:'white',borderColor:'#81D4FA',borderWidth:1,backgroundColor:'#29b6f6',borderRadius:5,height:38,fontSize:15,marginTop:5}} returnKeyType={'search'} placeholder="  search" onSubmitEditing={()=>this.btn_TimKiem_Click()}/>
+          </View>
+{/* ICON BUTTON SEARCH */}
+          <View style={{flex:1}}><TouchableHighlight underlayColor='#E0F7FA' onPress={()=>this.btn_TimKiem_Click()} style={{width:40,height:40,marginTop:5,borderRadius:20}}><Image source={require('../img/ic_search_white_24dp.png')} /></TouchableHighlight></View>
+{/* ICON BUTTON RING */}
+          <View style={{flex:1}}><TouchableHighlight underlayColor='#E0F7FA' onPress={()=>this.btn_DangNhap_Click()} style={{width:40,height:40,marginTop:5,borderRadius:20}}><Image source={require('../img/ic_notifications_none_white_24dp.png')} /></TouchableHighlight></View>
         </View>
-        <View style={{flex:1}}><TouchableHighlight onPress={()=>this.btn_TimKiem_Click()}><Image source={require('../img/ic_search_white_24dp.png')} style={{width:40,height:40,marginTop:5}}/></TouchableHighlight></View>
-        <View style={{flex:1}}>
-          <TouchableHighlight onPress={()=>this.btn_TimKiem_Click()}>
-            <Image source={require('../img/ic_notifications_none_black_24dp.png')} style={{width:40,height:40,marginTop:5}}>
-              <Text style={{color:'red',fontSize:15}}>1</Text>
-            </Image>
-          </TouchableHighlight>
+        <View style={{flexDirection:'row',marginTop:5,marginBottom:5}}>
+{/* PICKER BÁN MUA */}
+          <View style={{flex:3}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
+          <Picker style={{color:'white',height:30}} selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
+            {this.renderItemBan()}
+          </Picker></View>
+          </View>
+{/* PICKER LOẠI */}
+          <View style={{flex:4}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
+          <Picker style={{color:'white',height:30}} mode='dropdown' selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
+            {this.renderItemLoai()}
+          </Picker></View>
+          </View>
+{/* PICKER TỈNH THÀNH PHỐ */}
+          <View style={{flex:5}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',marginRight:5,borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
+          <Picker style={{color:'white',height:30}}rr selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
+            {this.renderItemTinh()}
+          </Picker></View>
+          </View>
         </View>
+        <View style={{height:1,backgroundColor:'#9E9E9Ed4'}}></View>
+        <View style={{height:2,backgroundColor:'#BDBDBDc4'}}></View>
+        <View style={{height:2,backgroundColor:'#E0E0E0'}}></View>
+        </View>
+
 
         <Modal
           animationType={"fade"}
@@ -100,68 +192,62 @@ export default class GuestMain extends Component{
           onRequestClose={() => {alert("Modal has been closed.")}}
           >
          <View style={{flex:1,flexDirection:'row'}}>
-          <View style={{flex:2,backgroundColor:'gray',borderRightWidth:2,borderRightColor:'blue'}}>
-          <Image source={require('../img/ngoctam.jpg')} style={{width:'100%',height:150}}>
-            <Image source={require('../img/thaole.jpg')} style={{width:100,height:100,marginTop:10,marginLeft:10,borderColor:'white',borderWidth:1,borderRadius:100}}/>
-            <Text style={{color:'white'}}>Thảo Lê</Text>
+          <View style={{flex:2,backgroundColor:'#FFF9C4'}}>
+          <Image source={require('../img/ngoctam.jpg')} style={{width:'100%',height:150,borderBottomWidth:1,borderColor:'gray'}}>
+            <Image source={require('../img/thaole.jpg')} style={{width:80,height:80,marginTop:25,marginLeft:10,borderColor:'white',borderWidth:1,borderRadius:100}}/>
+            <Text style={{color:'white',fontSize:20,marginTop:5,marginLeft:10}}>Kiều Nữ Ngọc Dinh</Text>
 </Image>
-            <TouchableHighlight onPress={() => {
-              this.setModalVisible(!this.state.modalVisible)
-            }}>
-              <View style={{flexDirection:'row'}}>
-              <Image source={require('../img/ic_power_settings_new_black_24dp.png')} style={{width:25,height:25}}/>
-              <Text>Tin nhắn</Text>
+            <TouchableHighlight  onPress={()=>this.btn_TinNhan_Click()}>
+              <View style={{flexDirection:'row',borderBottomWidth:1,borderBottomColor:'#BDBDBD',height:55}}>
+              <Image source={require('../img/messendger.png')} style={{width:50,height:50,marginTop:3,marginLeft:5}}/>
+              <Text style={{color:'black',fontSize:20,marginLeft:10,marginTop:15}}>Tin nhắn</Text>
+              </View>
+            </TouchableHighlight>
+            <TouchableHighlight onPress={() => this.btn_CuaHang_Click()}>
+              <View style={{flexDirection:'row',borderBottomWidth:1,borderBottomColor:'#BDBDBD',height:55}}>
+              <Image source={require('../img/shops.png')} style={{width:50,height:50,marginTop:3,marginLeft:5}}/>
+              <Text style={{color:'black',fontSize:18,marginLeft:10,marginTop:15}}>Cửa hàng</Text>
               </View>
             </TouchableHighlight>
             <TouchableHighlight onPress={() => {
               this.setModalVisible(!this.state.modalVisible)
             }}>
-              <View style={{flexDirection:'row'}}>
-              <Image source={require('../img/ic_power_settings_new_black_24dp.png')} style={{width:25,height:25}}/>
-              <Text>Cửa hàng</Text>
-              </View>
-            </TouchableHighlight>
-            <TouchableHighlight onPress={() => {
-              this.setModalVisible(!this.state.modalVisible)
-            }}>
-              <View style={{flexDirection:'row'}}>
-              <Image source={require('../img/ic_power_settings_new_black_24dp.png')} style={{width:25,height:25}}/>
-              <Text>Đang theo dỏi</Text>
+              <View style={{flexDirection:'row',borderBottomWidth:1,borderBottomColor:'#BDBDBD',height:55}}>
+              <Image source={require('../img/favorite.png')} style={{width:50,height:50,marginTop:3,marginLeft:5}}/>
+              <Text  style={{color:'black',fontSize:18,marginLeft:10,marginTop:15}}>Đang theo dỏi</Text>
               </View>
             </TouchableHighlight>
 
             <TouchableHighlight onPress={() => {
               this.setModalVisible(!this.state.modalVisible)
             }}>
-              <View style={{flexDirection:'row'}}>
-              <Image source={require('../img/ic_power_settings_new_black_24dp.png')} style={{width:25,height:25}}/>
-              <Text>Sự kiện</Text>
+              <View style={{flexDirection:'row',borderBottomWidth:1,borderBottomColor:'#BDBDBD',height:55}}>
+              <Image source={require('../img/calendar.png')} style={{width:50,height:50,marginTop:3,marginLeft:5}}/>
+              <Text  style={{color:'black',fontSize:18,marginLeft:10,marginTop:15}}>Sự kiện</Text>
               </View>
             </TouchableHighlight>
-            <TouchableHighlight onPress={() => {
-              this.setModalVisible(!this.state.modalVisible)
-            }}>
-              <View style={{flexDirection:'row'}}>
-              <Image source={require('../img/ic_power_settings_new_black_24dp.png')} style={{width:25,height:25}}/>
-              <Text>Thông tin cá nhân</Text>
-              </View>
-            </TouchableHighlight>
-
-            <TouchableHighlight onPress={() => {
-              this.setModalVisible(!this.state.modalVisible)
-            }}>
-              <View style={{flexDirection:'row'}}>
-              <Image source={require('../img/ic_power_settings_new_black_24dp.png')} style={{width:25,height:25}}/>
-              <Text>Trợ giúp</Text>
+            <TouchableHighlight onPress={() => this.btn_CaNhan_Click()}>
+              <View style={{flexDirection:'row',borderBottomWidth:1,borderBottomColor:'#BDBDBD',height:55}}>
+              <Image source={require('../img/user.png')} style={{width:50,height:50,marginTop:3,marginLeft:5}}/>
+              <Text  style={{color:'black',fontSize:18,marginLeft:10,marginTop:15}}>Cá nhân</Text>
               </View>
             </TouchableHighlight>
 
             <TouchableHighlight onPress={() => {
               this.setModalVisible(!this.state.modalVisible)
             }}>
-              <View style={{flexDirection:'row'}}>
-              <Image source={require('../img/ic_power_settings_new_black_24dp.png')} style={{width:25,height:25}}/>
-              <Text>Cài đặt</Text>
+              <View style={{flexDirection:'row',borderBottomWidth:1,borderBottomColor:'#BDBDBD',height:55}}>
+              <Image source={require('../img/support.png')} style={{width:50,height:50,marginTop:3,marginLeft:5}}/>
+              <Text  style={{color:'black',fontSize:18,marginLeft:10,marginTop:15}}>Trợ giúp</Text>
+              </View>
+            </TouchableHighlight>
+
+            <TouchableHighlight onPress={() => {
+              this.setModalVisible(!this.state.modalVisible)
+            }}>
+              <View style={{flexDirection:'row',borderBottomWidth:1,borderBottomColor:'#BDBDBD',height:55}}>
+              <Image source={require('../img/settings.png')} style={{width:50,height:50,marginTop:3,marginLeft:5}}/>
+              <Text style={{color:'black',fontSize:18,marginLeft:10,marginTop:15}}>Cài đặt</Text>
               </View>
             </TouchableHighlight>
 
@@ -169,57 +255,33 @@ export default class GuestMain extends Component{
             <TouchableHighlight onPress={() => {
               this.setModalVisible(!this.state.modalVisible)
             }}>
-              <View style={{flexDirection:'row'}}>
-              <Image source={require('../img/ic_power_settings_new_black_24dp.png')} style={{width:25,height:25}}/>
-              <Text>Đăng xuất</Text>
+              <View style={{flexDirection:'row',borderBottomWidth:1,borderBottomColor:'#BDBDBD',height:55}}>
+              <Image source={require('../img/logout.png')} style={{width:50,height:50,marginTop:3,marginLeft:5}}/>
+              <Text style={{color:'black',fontSize:18,marginLeft:10,marginTop:15}}>Đăng xuất</Text>
               </View>
-            </TouchableHighlight>
-
-
-            <TouchableHighlight onPress={() => {
-              this.setModalVisible(!this.state.modalVisible)
-            }}>
-              <Text>Hide Modal</Text>
             </TouchableHighlight>
 
           </View>
-          <TouchableHighlight style={{flex:1}} onPress={() => {
+          <TouchableHighlight underlayColor='#ffffff00' style={{flex:1,backgroundColor:'#212121a0'}} onPress={() => {
             this.setModalVisible(!this.state.modalVisible)
           }}><View></View></TouchableHighlight>
          </View>
 
         </Modal>
         </View>
+
       );
     };
   }
   render(){
 
     return(
-      <View>
-      <View>
+      <View style={{backgroundColor:'#E0E0E0',flex:1}}>
 {this.Logined(this)}
-      <View style={{flexDirection:'row'}}>
-        <View style={{flex:3}}>
-        <Picker selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
-          {this.renderItemBan()}
-        </Picker>
-        </View>
-        <View style={{flex:4}}>
-        <Picker mode='dropdown' selectedValue={this.state.selected1} onValueChange={(value)=>this.setState({selected:value})}>
-          {this.renderItemLoai()}
-        </Picker>
-        </View>
-        <View style={{flex:5}}>
-        <Picker selectedValue={this.state.selected2} onValueChange={(value)=>this.setState({selected:value})}>
-          {this.renderItemTinh()}
-        </Picker>
-        </View>
-      </View>
-      </View>
+
       <ListView
         dataSource={this.state.dataSource}
-        renderRow={(rowData)=><ItemListViewStatus obj={rowData}
+        renderRow={(rowData)=><ItemListViewStatus propsNavigator={this.props.propsNavigator} obj={rowData}
 
         ></ItemListViewStatus>}
       />
@@ -238,4 +300,23 @@ export default class GuestMain extends Component{
   btn_Menu_Click(){
     this.setModalVisible(true);
   }
+  btn_TinNhan_Click(){
+    this.setModalVisible(!this.state.modalVisible);
+    this.props.propsNavigator.push({
+      screen:'Messendger'
+    });
+  }
+  btn_CuaHang_Click(){
+    this.setModalVisible(!this.state.modalVisible);
+    this.props.propsNavigator.push({
+      screen:'ListShops'
+    });
+  }
+  btn_CaNhan_Click(){
+    this.setModalVisible(!this.state.modalVisible);
+    this.props.propsNavigator.push({
+      screen:'InfoPersonal'
+    });
+  }
+
 }

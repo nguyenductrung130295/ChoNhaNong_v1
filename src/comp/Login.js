@@ -10,7 +10,7 @@ export default class Login extends Component {
       <View style={{flex:1,backgroundColor:'#B3E5FC'}}>
       <View style={{flex:1}}>
         <View style={{margin:5}}>
-        <Image source={require('../img/logo1.png')} style={{width:'100%',height:'100%',alignItems:'flex-end'}} resizeMode="contain">
+        <Image source={require('../img/logo2.png')} style={{width:'100%',height:'85%',alignItems:'flex-end'}} resizeMode="contain">
           <TouchableHighlight style={{width:40,height:40,borderRadius:40}} onPress={()=>this.btn_BackScreen_Click()} underlayColor={'#E1F5FE'}>
           <Image source={require('../img/ic_clear_white_24dp.png')} style={{width:40,height:40,marginTop:5}}/></TouchableHighlight>
         </Image>

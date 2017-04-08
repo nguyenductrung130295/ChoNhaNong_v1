@@ -32,6 +32,7 @@ export default class StatusDetail extends Component{
   render(){
     return(
       <View>
+      
 <ScrollView>
   {/* Listview trượt nằm ngang
     <ListView

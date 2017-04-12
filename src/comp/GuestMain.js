@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import {AppRegistry,View,Modal,Text,TextInput,Item,TouchableHighlight,Picker,Button,Image,ListView} from 'react-native';
+import {AsyncStorage,AppRegistry,View,Modal,Text,TextInput,Item,TouchableHighlight,Picker,Button,Image,ListView} from 'react-native';
 import ItemListViewStatus from '../item_customer/ItemListViewStatus';
 export default class GuestMain extends Component{
   constructor(props){
@@ -253,7 +253,7 @@ export default class GuestMain extends Component{
 
 
             <TouchableHighlight onPress={() => {
-              this.setModalVisible(!this.state.modalVisible)
+                AsyncStorage.setItem('uid_store',null);
             }}>
               <View style={{flexDirection:'row',borderBottomWidth:1,borderBottomColor:'#BDBDBD',height:55}}>
               <Image source={require('../img/logout.png')} style={{width:50,height:50,marginTop:3,marginLeft:5}}/>

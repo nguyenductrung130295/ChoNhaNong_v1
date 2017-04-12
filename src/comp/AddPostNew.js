@@ -1,7 +1,6 @@
 import React,{Component} from 'react';
 import {AppRegistry,View,ScrollView,Image,Text,TextInput,Platform,TouchableHighlight,Picker,Button} from 'react-native';
 import ImagePicker from 'react-native-image-picker';
-import firebase from './FirebaseAPI';
 import RNFetchBlob from 'react-native-fetch-blob';
 
 const Blob=RNFetchBlob.polyfill.Blob;

@@ -1,6 +1,6 @@
 import React,{Component} from 'react';
-import {AppRegistry,View,Navigator,BackAndroid} from 'react-native';
-
+import {AppRegistry,View,Navigator,BackAndroid,AsyncStorage,Text} from 'react-native';
+import Users from '../entities/Users'
 import FirstDisplay from './FirstDisplay';
 import GuestMain from './GuestMain';
 import HomeGuest from './HomeGuest';
@@ -14,7 +14,8 @@ import StatusDetail from './StatusDetail'
 import ListShops from './ListShops'
 export default class NavigatorChuyenTrang extends Component{
   constructor(props) {
-      super(props)
+      super(props);
+
       this.navigator = null;
 
       this.handleBack = (() => {
@@ -25,6 +26,12 @@ export default class NavigatorChuyenTrang extends Component{
 
         return false; //close the app
       }).bind(this) //don't forget bind this, you will remenber anyway.
+      this.state={
+        uid:'-1'
+      };
+      AsyncStorage.getItem("uid_store").then((value) => {
+                  this.setState({"uid": value});
+              }).done();
     }
 
     componentDidMount() {
@@ -77,14 +84,38 @@ export default class NavigatorChuyenTrang extends Component{
       //case 'FirebaseKey':return <FirebaseKey propsNavigator={navigator} {...data}/>
     }
   }
+  UserLogined(){
+
+    if(this.state.uid===null){
+      return(
+        <Navigator
+          initialRoute={{screen:'Register'}}
+          ref={navigator => {this.navigator = navigator}}
+          renderScene={this._renderScene.bind(this)}
+        />
+
+      );
+    }else if(this.state.uid!==null && this.state.uid!=='-1'){
+      return(
+        <Navigator
+          initialRoute={{screen:'GuestMain'}}
+          ref={navigator => {this.navigator = navigator}}
+          renderScene={this._renderScene.bind(this)}
+        />
+      );
+    }else{
+      return(
+        <View><Text>Waiting
+        </Text></View>
+      );
+    }
+  }
   render(){
     //initialRoute là màn hình chạy đầu tiên
     return(
-      <Navigator
-        initialRoute={{screen:'GuestMain'}}
-        ref={navigator => {this.navigator = navigator}}
-        renderScene={this._renderScene.bind(this)}
-      />
+
+      this.UserLogined()
+
     );
   }
 }

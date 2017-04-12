@@ -1,8 +1,13 @@
 import React,{Component} from 'react';
-import {AppRegistry,Text,TextInput,View, Button,Image,TouchableHighlight} from 'react-native';
+import {AsyncStorage,AppRegistry,Text,TextInput,View, Button,Image,TouchableHighlight} from 'react-native';
+import Users from '../entities/Users'
 export default class Login extends Component {
   constructor(props){
     super(props);
+    this.state={
+      sdt:'',
+      mk:''
+    };
   }
 
   render(){
@@ -10,7 +15,7 @@ export default class Login extends Component {
       <View style={{flex:1,backgroundColor:'#B3E5FC'}}>
       <View style={{flex:1}}>
         <View style={{margin:5}}>
-        <Image source={require('../img/logo2.png')} style={{width:'100%',height:'85%',alignItems:'flex-end'}} resizeMode="contain">
+        <Image source={require('../img/logo1.png')} style={{width:'100%',height:'85%',alignItems:'flex-end'}} resizeMode="contain">
           <TouchableHighlight style={{width:40,height:40,borderRadius:40}} onPress={()=>this.btn_BackScreen_Click()} underlayColor={'#E1F5FE'}>
           <Image source={require('../img/ic_clear_white_24dp.png')} style={{width:40,height:40,marginTop:5}}/></TouchableHighlight>
         </Image>
@@ -20,14 +25,14 @@ export default class Login extends Component {
       <View style={{flex:1}}>
       <View style={{margin:15}}>
         <Text style={{fontWeight:'bold',fontSize:20,color:'#01579B'}}>Số điện thoại</Text>
-        <TextInput style={{borderRadius:5,backgroundColor:'white',fontSize:20}} underlineColorAndroid="white"/>
+        <TextInput style={{borderRadius:5,backgroundColor:'white',fontSize:20}} underlineColorAndroid="white" onChangeText={(value)=>this.setState({sdt:value})}/>
 
         <View style={{flexDirection:'row',marginTop:7}}>
           <View style={{flex:1}}><Text style={{fontWeight:'bold',fontSize:20,color:'#01579B',marginTop:7}}>Mật khẩu</Text></View>
           <View style={{flex:2,alignItems:'flex-end'}}><Text style={{fontStyle:'italic',marginTop:7,fontSize:15,color:'#FF9800'}}>Quên mật khẩu?</Text></View>
         </View>
 
-        <TextInput secureTextEntry={true} onSubmitEditing={()=>this.btn_DangNhap_Click()} style={{borderRadius:5,backgroundColor:'white',fontSize:20}} underlineColorAndroid="white"/>
+        <TextInput secureTextEntry={true} onSubmitEditing={()=>this.btn_DangNhap_Click()} style={{borderRadius:5,backgroundColor:'white',fontSize:20}} underlineColorAndroid="white"  onChangeText={(value)=>this.setState({mk:value})}/>
         <Text>{"\n"}</Text>
         <Button onPress={()=>this.btn_DangNhap_Click()} title={'Đăng nhập'} color='#03A9F4'></Button>
 <Text>{"\n"}</Text>
@@ -40,7 +45,10 @@ export default class Login extends Component {
 
   }
   btn_DangNhap_Click(){
-    alert('button danh nhap dc click');
+    var us=new Users();
+    us.sdt=this.state.sdt;
+    us.matkhau=this.state.mk;
+    us.DanhNhap(this.props);
   }
   btn_DangKy_Click(){
     this.props.propsNavigator.push({

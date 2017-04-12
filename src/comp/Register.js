@@ -1,6 +1,6 @@
 import React,{Component} from 'react';
 import {AppRegistry,Text,TextInput,Button,View,Image,TouchableHighlight} from 'react-native';
-import firebase from './FirebaseAPI'
+import Users from '../entities/Users'
 export default class Register extends Component{
   constructor(props){
     super(props);
@@ -26,27 +26,35 @@ export default class Register extends Component{
       </View>
       <View style={{flex:2,padding:15}}>
         <Text style={{fontWeight:'bold',fontSize:20,color:'#01579B'}}>Họ và tên:</Text>
-        <TextInput placeholder="họ và tên" style={{borderRadius:5,backgroundColor:'white',fontSize:20}} underlineColorAndroid="white"/>
+        <TextInput onChangeText={(value)=>this.setState({ten:value})} style={{borderRadius:5,backgroundColor:'white',fontSize:20}} underlineColorAndroid="white"/>
 <Text style={{fontWeight:'bold',fontSize:20,color:'#01579B'}}>Số điện thoại:</Text>
-        <TextInput placeholder="số điện thoại" style={{borderRadius:5,backgroundColor:'white',fontSize:20}} underlineColorAndroid="white"/>
+        <TextInput onChangeText={(value)=>this.setState({sdt:value})}  style={{borderRadius:5,backgroundColor:'white',fontSize:20}} underlineColorAndroid="white"/>
 <Text style={{fontWeight:'bold',fontSize:20,color:'#01579B'}}>Mật khẩu:</Text>
-        <TextInput placeholder="mật khẩu" style={{borderRadius:5,backgroundColor:'white',fontSize:20}} underlineColorAndroid="white"/>
+        <TextInput onChangeText={(value)=>this.setState({mk:value})}  style={{borderRadius:5,backgroundColor:'white',fontSize:20}} underlineColorAndroid="white"/>
 <Text style={{fontWeight:'bold',fontSize:20,color:'#01579B'}}>Nhập lại mật khẩu:</Text>
-        <TextInput placeholder="nhập lại mật khẩu" style={{borderRadius:5,backgroundColor:'white',fontSize:20}} underlineColorAndroid="white"/>
+        <TextInput  onChangeText={(value)=>this.setState({xnmk:value})} style={{borderRadius:5,backgroundColor:'white',fontSize:20}} underlineColorAndroid="white"/>
         <Text>{"\n"}</Text>
-        <Button onPress={()=>this.btn_DangKy()}  title={'Đăng ký'}></Button>
+        <View style={{flexDirection:'row'}}>
+          <View style={{flex:1}}>
+            <Button onPress={()=>alert('click button')} title="Hủy bỏ" color='#FF3D00'/>
+          </View>
+          <View style={{flex:3,marginLeft:10}}>
+              <Button onPress={()=>this.btn_DangKy_Click()} title="Đăng Ký"/>
+          </View>
+        </View>
       </View>
       </View>
     );
   }
-  btn_DangKy(){
-    //kiểm tra hợp lệ
-
-    //kết nối firebase
-
-    //insert vào table_users
-
-//insert không thành công
+  btn_DangKy_Click(){
+    //làm kiểu này thì nó chuyển trang trước khi nó thêm vào firebase, dù thành công hay ko
+    //mà đc cái có oop
+    var us=new Users();
+    us.ten=this.state.ten;
+    us.matkhau=this.state.mk;
+    us.sdt=this.state.sdt;
+    //gọi medthod Đăng ký
+    us.DangKy(this.props);
 
   }
   btn_BackScreen_Click(){

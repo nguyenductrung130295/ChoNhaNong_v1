@@ -79,7 +79,7 @@ export default class ListViewBasics extends Component {
   }
   render() {
     return (
-      
+
       <ListView
         dataSource={this.state.dataSource}
         renderRow={(rowData)=><ItemListViewStatus obj={rowData}

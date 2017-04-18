@@ -1,11 +1,14 @@
 import React,{Component} from 'react';
 import {AppRegistry,View,Image,Text,TouchableHighlight,ListView,Button} from 'react-native';
 import ItemListViewStatus from '../item_customer/ItemListViewStatus';
-import ItemShowAllImage from '../item_customer/ItemShowAllImage'
+import ItemShowAllImage from '../item_customer/ItemShowAllImage';
 import AddPostNew from './AddPostNew'
+import firebase from '../entities/FirebaseAPI'
+import Users from '../entities/Users'
 export default class InfoPersonal extends Component{
   constructor(props){
     super(props);
+
     data=[
       {
         title:"Dinh Khung",
@@ -56,13 +59,40 @@ export default class InfoPersonal extends Component{
 
       }
     ];
+
+
     const ds=new ListView.DataSource({rowHasChanged:(r1,r2) => r1 !== r2});
     this.state={
       dataSource:ds.cloneWithRows(data),
       imgyes:false,
       options:1,//1:bài đăng,2:thông tin,3:ảnh
-      mysefl:false,//false: là khách xem ,true: là ban than ca nhan ho xem minh
+      mysefl:false,
+      //false: là khách xem ,true: là ban than ca nhan ho xem minh
+      user:new Users(),
     }
+  }
+  componentWillMount(){
+    database=firebase.database();
+    tb_user=database.ref('db_marketsfarmers/table_users');
+    us=new Users();
+
+    tb_user.orderByKey().equalTo(this.props.uidSession).on('value',(snap)=>{
+      if(snap.exists()){
+        snap.forEach((data)=>{
+          us.uid=data.key;
+          us.hovaten=data.val().hovaten;
+          us.sdt=data.val().sdt;
+          us.diachi=data.val().diachi;
+          us.email=data.val().email;
+          us.anhdaidien=data.val().anhdaidien;
+          us.anhbia=data.val().anhbia;
+        });
+        this.setState({user:us});
+      }
+      else{
+        alert('firebase error');
+      }
+  });
   }
   yesImg(){
     if(this.state.imgyes){
@@ -80,17 +110,17 @@ export default class InfoPersonal extends Component{
     return(
       <View style={{flex:1}}>
         <View style={{flex:1}}>
-          <Image style={{width:'100%',height:'100%'}} source={require('../img/icondefault.jpg')}>
+          <Image style={{width:'100%',height:'100%'}}  source={{uri:this.state.user.anhbia}}>
           <View style={{flexDirection:'row',backgroundColor:'#00000030'}}>
 <View style={{flex:1}}><TouchableHighlight underlayColor='pink' onPress={()=>this.btn_Back_Click()}><Image source={require('../img/ic_arrow_back_white_24dp.png')} style={{width:40,height:40,marginTop:5}}/></TouchableHighlight></View>
           <View style={{flex:6}}>
           </View>
           <View style={{flex:1}}><TouchableHighlight onPress={()=>this.btn_TimKiem_Click()}><Image source={require('../img/ic_more_vert_white_24dp.png')} style={{width:40,height:40,marginTop:5}}/></TouchableHighlight></View>
           </View>
-            <Image style={{width:100,height:100,borderRadius:100,borderWidth:1,borderColor:'white',marginLeft:15,marginTop:30}} source={require('../img/ngoctam.jpg')}/>
+            <Image style={{width:100,height:100,borderRadius:100,borderWidth:1,borderColor:'white',marginLeft:15,marginTop:30}} source={{uri:this.state.user.anhdaidien}}/>
             <View style={{flexDirection:'row',height:30}}>
             <View style={{flex:6}}>
-            <Text style={{marginLeft:10,marginTop:5,color:'white',fontSize:20}}>Trần Thị Ngọc Tâm
+            <Text style={{marginLeft:10,marginTop:5,color:'white',fontSize:20}}>{this.state.user.hovaten}
             </Text>
               </View>
               <View style={{flex:2,paddingRight:10,paddingBottom:3}}>
@@ -163,30 +193,30 @@ export default class InfoPersonal extends Component{
         <View style={{padding:10}}>
         <TouchableHighlight>
           <View style={{flexDirection:'row',margin:5,borderBottomWidth:1,borderBottomColor:'gray'}}>
-            <Image source={require('../img/thaole.jpg')} style={{width:30,height:30,marginRight:5}}/>
+            <Image source={{uri:this.state.user.anhdaidien}} style={{width:30,height:30,marginRight:5}}/>
             <Text style={{fontSize:18,fontWeight:'bold'}}>Họ và tên: </Text>
-            <Text style={{fontSize:18}}>Thảo Lê</Text>
+            <Text style={{fontSize:18}}>{this.state.user.hovaten}</Text>
           </View>
         </TouchableHighlight>
         <TouchableHighlight>
           <View style={{flexDirection:'row',margin:5,borderBottomWidth:1,borderBottomColor:'gray'}}>
-            <Image source={require('../img/thaole.jpg')} style={{width:30,height:30,marginRight:5}}/>
+            <Image source={require('../img/mobile-phone.png')} style={{width:30,height:30,marginRight:5}}/>
 <Text style={{fontSize:18,fontWeight:'bold'}}>Số điện thoại: </Text>
-            <Text style={{fontSize:18}}>0987654321</Text>
+            <Text style={{fontSize:18}}>{this.state.user.sdt}</Text>
           </View>
         </TouchableHighlight>
         <TouchableHighlight>
           <View style={{flexDirection:'row',margin:5,borderBottomWidth:1,borderBottomColor:'gray'}}>
-            <Image source={require('../img/thaole.jpg')} style={{width:30,height:30,marginRight:5}}/>
+            <Image source={require('../img/placeholder.png')} style={{width:30,height:30,marginRight:5}}/>
 <Text style={{fontSize:18,fontWeight:'bold'}}>Địa chỉ: </Text>
-            <Text style={{fontSize:18}}>Xuân Nam-Diên Xuân -Diên Khánh-Khánh Hòa</Text>
+            <Text style={{fontSize:18}}>{this.state.user.diachi}</Text>
           </View>
         </TouchableHighlight>
         <TouchableHighlight>
           <View style={{flexDirection:'row',margin:5,borderBottomWidth:1,borderBottomColor:'gray'}}>
-            <Image source={require('../img/thaole.jpg')} style={{width:30,height:30,marginRight:5}}/>
-            <Text style={{fontSize:18,fontWeight:'bold'}}>Lời giới thiệu: </Text>
-            <Text style={{fontSize:18}}>Anh đẹp trai to con</Text>
+            <Image source={require('../img/letter.png')} style={{width:30,height:30,marginRight:5}}/>
+            <Text style={{fontSize:18,fontWeight:'bold'}}>Email: </Text>
+            <Text style={{fontSize:18}}>{this.state.user.email}</Text>
           </View>
         </TouchableHighlight>
 

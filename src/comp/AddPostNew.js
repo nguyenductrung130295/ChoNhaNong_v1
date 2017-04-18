@@ -1,18 +1,26 @@
 import React,{Component} from 'react';
 import {AppRegistry,View,ScrollView,Image,Text,TextInput,Platform,TouchableHighlight,Picker,Button} from 'react-native';
+//import thư viện để lấy ảnh
 import ImagePicker from 'react-native-image-picker';
 import RNFetchBlob from 'react-native-fetch-blob';
+//import thư viện firebase
+import firebase from '../entities/FirebaseAPI';
 
+//cái khỉ gì vậy?
 const Blob=RNFetchBlob.polyfill.Blob;
 const fs=RNFetchBlob.fs;
 window.XMLHttpRequest=RNFetchBlob.polyfill.XMLHttpRequest;
 window.Blob=Blob;
-
+// hàm uploadImage vào firebase uri là đường dẫn file ảnh
+//ko cần hiểu biết xài là dc,
 const uploadImage=(uri,imageName,mime='image/jpg')=>{
   return new Promise((resolve,reject)=>{
+    //nếu là IOS thì uri.replace() không thì sau : uri
     const uploadUri=Platform.OS==='ios'? uri.replace('file://',''):uri;
     let uploadBlob=null;
-    const imageRef=firebase.storage().ref('photos').child(imageName);
+    //lưu vào storage trên firebase
+    const imageRef=firebase.storage().ref('photos/photo_posts').child(imageName);
+    //chổ này ko cần quan tâm
     fs.readFile(uploadUri,'base64').then((data)=>{
       return Blob.build(data,{type:'${mime};BASE64'});
     }).then((blob)=>{
@@ -33,40 +41,58 @@ export default class AddPostNew extends Component{
   constructor(props){
     super(props);
     arrayImagePath=[];
-    tien=['VND','USD'];
-    loai=['Trái cây','Gia súc'];
-    tinh=['Hà Nội','Nha Trang','Hồ Chí Minh','Cà Mau'];
+    muaban=['Mua','Bán'];
+    tien=['VND','USD'];//khởi tạo giá trị cho picker loại giá tiền
+    loai=['Trái cây','Gia súc'];//khởi tạo giá trị cho picker Loại sẩn phẩm đăng tin
+    tinh=['Hà Nội','Nha Trang','Hồ Chí Minh','Cà Mau'];// picker chứa tỉnh thành phố
     this.state={
-      imagePath:'',
-      imageHeight:'',
-      imageWidth:'',
-      key:'',
-      firstname:'',
-      lastname:'',
-      cur_img:-1,// image dang hien
+      imagePath:'',//đường dẫn ảnh
+      imageHeight:'',//chiều cao ảnh
+      imageWidth:'',//rộng ảnh
+      key:'',//?
+      //thoogn tin posts input
+      txt_tieude:'',//txt input tiêu đề
+      txt_gia:'',//giá
+      txt_diachi_txh:'',//thôn xã huyện
+      txt_noidung:'',//nội dung bài đăng
+      cur_img:-1,// thứ tự image dang hien trong cái xem hinh ở trên màn hình
       sum_img:0,//tổng image trong arrayImage
-      arrayImage:[],
-      selected1:'VND',
-      selected2:'Trái cây',
-      selected3:'Hồ Chí Minh'
+      arrayImage:[],//mảng chứa đường dẫn ảnh
+      valueTienPicker:'VND',//chọn giá trị mặc đinh cho picker giá
+      valueLoaiPicker:'Trái cây',//chọn giá trị mặc đinh cho picker loại
+      valueTinhTPPicker:'Hồ Chí Minh',//chọn giá trị mặc đinh cho picker tỉnh/thành phố
+      valueMuaBan:'Bán',//chọn giá trị mua hoặc bán
     };
 
   }
   renderItemTinh(){
+    //render picker Tỉnh thành phố ra màn hình
     items=[];
+    //lây mỗi item trong mảng tỉnh push "PICKEr.item" vào
     for(let item of tinh){
       items.push(<Picker.Item key={item} label={item} value={item}/>)
     }
+    //trả về danh sách trong picker cho PICKER
     return items;
   }
   renderItemTien(){
+    //render picker loại tiến ra màn hình
     items=[];
     for(let item of tien){
       items.push(<Picker.Item key={item} label={item} value={item}/>)
     }
     return items;
   }
+  renderItemMuaBan(){
+    //render picker loại tiến ra màn hình
+    items=[];
+    for(let item of muaban){
+      items.push(<Picker.Item key={item} label={item} value={item}/>)
+    }
+    return items;
+  }
   renderItemLoai(){
+    //render picker loại sp ra màn hình
     items=[];
     for(let item of loai){
       items.push(<Picker.Item key={item} label={item} value={item}/>)
@@ -170,28 +196,56 @@ export default class AddPostNew extends Component{
           <Image source={require('../img/add_image_postnew.png')} style={{backgroundColor:'#616161',width:"100%",height:200,borderWidth:1,borderColor:'#BDBDBD'}}>
           </Image></TouchableHighlight>}
           <View style={{padding:10,backgroundColor:'#E0E0E0'}}>
+          {/* INPUT TIÊU ĐỀ BÀI ĐĂNG */}
         <TextInput placeholder="Tiêu đề bài đăng" underlineColorAndroid="white" style={{backgroundColor:'white',fontSize:18,color:'black',height:45,borderWidth:1,borderColor:'#03A9F4',borderRadius:2}}/>
-        <View style={{flexDirection:'row',marginTop:5}}>
-          <View style={{flex:3,justifyContent:'center'}}><Text style={{fontSize:18,color:'black'}}>Loại sản phẩm: </Text></View>
+
+
+
+          <View style={{flexDirection:'row',marginTop:5}}>
           <View style={{flex:4,justifyContent:'center'}}>
-            <View style={{backgroundColor:'white',borderWidth:1,borderColor:'#03A9F4',borderRadius:2,height:45}}><Picker mode='dropdown' selectedValue={this.state.selected2} onValueChange={(value)=>this.setState({selected2:value})}>
+            <View style={{backgroundColor:'white',borderWidth:1,borderColor:'#03A9F4',borderRadius:2,height:45}}>
+          {/* PICKER LOẠI SP */}
+            <Picker mode='dropdown' selectedValue={this.state.valueLoaiPicker} onValueChange={(value)=>this.setState({valueLoaiPicker:value})}>
             {this.renderItemLoai()}
           </Picker></View>
           </View>
+
+          {/* PICKER MuaBan */}
+            <View style={{flex:3,justifyContent:'center'}}>
+<View style={{backgroundColor:'white',borderWidth:1,borderColor:'#03A9F4',borderRadius:2,height:45,marginLeft:5}}>
+            <Picker selectedValue={this.state.valueMuaBan} onValueChange={(value)=>this.setState({valueMuaBan:value})}>
+              {this.renderItemMuaBan()}
+            </Picker>
+          </View>
+            </View>
         </View>
         <View style={{flexDirection:'row',marginTop:5}}>
-          <View style={{flex:6}}><TextInput underlineColorAndroid="white" style={{backgroundColor:'white',fontSize:18,color:'black',height:45,borderWidth:1,borderColor:'#03A9F4',borderRadius:2}} placeholder="Giá"/></View>
-          <View style={{flex:4}}><View style={{backgroundColor:'white',borderWidth:1,borderColor:'#03A9F4',borderRadius:2,height:45,marginLeft:5}}><Picker selectedValue={this.state.selected1} onValueChange={(value)=>this.setState({selected1:value})}>
+          <View style={{flex:6}}>
+          {/* INPUT GIÁ */}
+          <TextInput underlineColorAndroid="white"
+          style={{backgroundColor:'white',fontSize:18,color:'black',height:45,borderWidth:1,borderColor:'#03A9F4',borderRadius:2}} placeholder="Giá"/></View>
+          <View style={{flex:4}}><View style={{backgroundColor:'white',borderWidth:1,borderColor:'#03A9F4',borderRadius:2,height:45,marginLeft:5}}>
+{/* PICKER LOẠI TIỀN */}
+          <Picker selectedValue={this.state.valueTienPicker} onValueChange={(value)=>this.setState({valueTienPicker:value})}>
             {this.renderItemTien()}
           </Picker></View></View>
         </View>
         <View style={{flexDirection:'row',marginTop:5}}>
-          <View style={{flex:6}}><TextInput underlineColorAndroid="white" style={{backgroundColor:'white',fontSize:18,color:'black',height:45,borderWidth:1,borderColor:'#03A9F4',borderRadius:2}} placeholder="Địa chỉ"/></View>
-          <View style={{flex:4}}><View style={{backgroundColor:'white',borderWidth:1,borderColor:'#03A9F4',borderRadius:2,height:45,marginLeft:5}}><Picker selectedValue={this.state.selected3} onValueChange={(value)=>this.setState({selected:value})}>
+          <View style={{flex:6}}>
+{/* INPUT DIACHI THÔN XÃ HUYỆN */}
+          <TextInput underlineColorAndroid="white" style={{backgroundColor:'white',fontSize:18,color:'black',height:45,borderWidth:1,borderColor:'#03A9F4',borderRadius:2}} placeholder="Địa chỉ"/></View>
+          <View style={{flex:4}}><View style={{backgroundColor:'white',borderWidth:1,borderColor:'#03A9F4',borderRadius:2,height:45,marginLeft:5}}>
+{/* PICKER TỈNH THÀNH PHỐ */}
+          <Picker selectedValue={this.state.valueTinhTPPicker}
+           onValueChange={(value)=>this.setState({valueTinhTPPicker:value})}>
             {this.renderItemTinh()}
           </Picker></View></View>
         </View>
-        <TextInput underlineColorAndroid="white" placeholder="Nội dung" multiline={true} numberOfLines = {8} style={{backgroundColor:'white',marginTop:5,marginBottom:5,fontSize:18,color:'black',borderWidth:1,borderColor:'#03A9F4',borderRadius:2}}/>
+        {/* INPUT Nội dung  */}
+        <TextInput underlineColorAndroid="white"
+        placeholder="Nội dung" multiline={true}
+        numberOfLines = {8}
+        style={{backgroundColor:'white',marginTop:5,marginBottom:5,fontSize:18,color:'black',borderWidth:1,borderColor:'#03A9F4',borderRadius:2}}/>
         <View style={{flexDirection:'row'}}>
           <View style={{flex:1}}>
             <Button onPress={()=>alert('click button')} title="Hủy bỏ" color='#FF3D00'/>
@@ -219,8 +273,12 @@ export default class AddPostNew extends Component{
       </View>
     );
   }
+  //bấm nút nét gọi hàm này
   btn_NextImage(){
+    // kiểm tra tổng hình có >0 là coi có hình nào dc chọn chưa
+    //cur_img<sum_img-1 là kiểm tra thử vị trí hình đang hiện ko là hình cuối trong danh sách, nói chung điều kiện để next tiếp
     if(this.state.sum_img>0 && (this.state.cur_img < this.state.sum_img-1)){
+      //khi next dc thì set vị trí hình đang xem hiện tại lại, tăng lên 1 trong mang arrayImaàm
       this.setState({
         cur_img:this.state.cur_img+1,
         imagePath:this.state.arrayImage[this.state.cur_img+1]

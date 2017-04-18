@@ -13,11 +13,11 @@ export default class ItemShop extends Component{
         <TouchableHighlight onPress={()=>this.btn_ItemIsClick()}>
         <View style={{flexDirection:'row'}}>
         <View>
-          <Image source={{uri:this.props.obj.imgsrc}} style={{width: 60, height: 60,borderRadius:100,marginLeft:10,marginTop:5,marginRight:5,marginBottom:5,borderColor:'white',borderWidth:1}}>
+          <Image source={{uri:this.props.obj.logoshop}} style={{width: 60, height: 60,borderRadius:100,marginLeft:10,marginTop:5,marginRight:5,marginBottom:5,borderColor:'white',borderWidth:1}}>
           </Image>
         </View>
         <View style={{padding:5,borderBottomWidth:1,borderBottomColor:'white',width:'100%'}}>
-          <Text style={{color:'black',fontSize:18,marginTop:5}}>{this.props.obj.nameshop}</Text>
+          <Text style={{color:'black',fontSize:18,marginTop:5}}>{this.props.obj.tencuahang}</Text>
           <Text style={{fontSize:13}}>{this.props.obj.loaisp}</Text>
         </View>
         </View>

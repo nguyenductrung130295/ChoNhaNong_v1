@@ -1,9 +1,12 @@
 import React,{Component} from 'react';
-import {AsyncStorage,AppRegistry,View,Modal,Text,TextInput,Item,TouchableHighlight,Picker,Button,Image,ListView} from 'react-native';
+import {AsyncStorage,AppRegistry,View,
+  Modal,Text,TextInput,Item,TouchableHighlight,Picker,Button,Image,ListView} from 'react-native';
 import ItemListViewStatus from '../item_customer/ItemListViewStatus';
+import Users from '../entities/Users'
+import firebase from '../entities/FirebaseAPI';
 export default class GuestMain extends Component{
   constructor(props){
-    super(props);
+    super(props);//
     muaban=['Mua','Bán'];
     loai=['Trái cây','Gia súc'];
     tinh=['Hà Nội','Nha Trang','Hồ Chí Minh','Cà Mau'];
@@ -69,13 +72,46 @@ export default class GuestMain extends Component{
     const ds=new ListView.DataSource({rowHasChanged:(r1,r2) => r1 !== r2});
     this.state={
       dataSource:ds.cloneWithRows(data),
-      modalVisible:false,
-      selected1:'Mua',
+      modalVisible:false,//hiện ẩn modal menu
+      uid:'-1',//
+      selected1:'Mua',//mặc định
       selected2:'Trái cây',
-      selected3:'Hồ Chí Minh'
+      selected3:'Hồ Chí Minh',
+      user:new Users(),//state là user mới có thể thay đổi dc
     };
 
 
+  }
+  componentWillMount(){
+    //kiểm tra uid session
+    if(this.props.uidSession!=='0' && this.props.uidSession!=='-1'){//
+      //khởi tạo firebase để lấy thông tin user từ uid đó
+      database=firebase.database();
+      tb_user=database.ref('db_marketsfarmers/table_users');
+      //tạo user tạm us
+      us=new Users();
+      //orderByKey để chọn cột key,
+      tb_user.orderByKey().equalTo(this.props.uidSession).on('value',(snap)=>{
+          if(snap.exists()){//kiểm tra tồn tại user
+            snap.forEach((data)=>{//data là 1 user lấy dc trong danh sách user trong list snap
+              //lưu thông tin vào user tạm us
+              us.uid=data.key;
+              us.hovaten=data.val().hovaten;
+              us.sdt=data.val().sdt;
+              us.diachi=data.val().diachi;
+              us.email=data.val().email;
+              us.anhdaidien=data.val().anhdaidien;
+              us.anhbia=data.val().anhbia;
+            });
+            //sau khi lấy thông tin user ở code trên lưu vào state.user
+            this.setState({user:us});
+          }
+          else{
+            alert('firebase error');
+          }
+      });
+
+    }
   }
   renderItemBan(){
     items=[];
@@ -102,8 +138,10 @@ export default class GuestMain extends Component{
     this.setState({modalVisible: visible});
   }
   Logined(){
-    var t=true;
-    if(!t){
+
+//nếu uid =0 tức là chưa đăng nhập thì hiện ra ko có modal menu
+//cái này dành cho người dùng tìm kiếm mà ko cần đăng nhập
+    if(this.props.uidSession==='0'){
       return(
         <View style={{backgroundColor:'#03A9F4'}}>
         <View style={{flexDirection:'row'}}>
@@ -144,7 +182,8 @@ export default class GuestMain extends Component{
       );
 
     }
-    else{
+    else if(this.props.uidSession!==' ' && this.props.uidSession!=='-1' && this.props.uidSession!==null){
+//đã đăng nhập: render ra modal chứa menu
       return (
         <View>
         <View style={{backgroundColor:'#03A9F4'}}>
@@ -184,7 +223,7 @@ export default class GuestMain extends Component{
         <View style={{height:2,backgroundColor:'#E0E0E0'}}></View>
         </View>
 
-
+{/* modal menu nè */}
         <Modal
           animationType={"fade"}
           transparent={true}
@@ -193,9 +232,10 @@ export default class GuestMain extends Component{
           >
          <View style={{flex:1,flexDirection:'row'}}>
           <View style={{flex:2,backgroundColor:'#FFF9C4'}}>
-          <Image source={require('../img/ngoctam.jpg')} style={{width:'100%',height:150,borderBottomWidth:1,borderColor:'gray'}}>
-            <Image source={require('../img/thaole.jpg')} style={{width:80,height:80,marginTop:25,marginLeft:10,borderColor:'white',borderWidth:1,borderRadius:100}}/>
-            <Text style={{color:'white',fontSize:20,marginTop:5,marginLeft:10}}>Kiều Nữ Ngọc Dinh</Text>
+          {/* load ảnh bìa, ảnh đại diện, tên người dùng vào menu  từ state.user đã lấy thông tin lúc nãy*/}
+          <Image source={{uri:this.state.user.anhbia}} style={{width:'100%',height:150,borderBottomWidth:1,borderColor:'gray'}}>
+            <Image source={{uri:this.state.user.anhdaidien}} style={{width:80,height:80,marginTop:25,marginLeft:10,borderColor:'white',borderWidth:1,borderRadius:100}}/>
+            <Text style={{color:'white',fontSize:20,marginTop:5,marginLeft:10}}>{this.state.user.hovaten}</Text>
 </Image>
             <TouchableHighlight  onPress={()=>this.btn_TinNhan_Click()}>
               <View style={{flexDirection:'row',borderBottomWidth:1,borderBottomColor:'#BDBDBD',height:55}}>
@@ -243,7 +283,7 @@ export default class GuestMain extends Component{
             </TouchableHighlight>
 
             <TouchableHighlight onPress={() => {
-              this.setModalVisible(!this.state.modalVisible)
+              this.btn_Caidat_Click()
             }}>
               <View style={{flexDirection:'row',borderBottomWidth:1,borderBottomColor:'#BDBDBD',height:55}}>
               <Image source={require('../img/settings.png')} style={{width:50,height:50,marginTop:3,marginLeft:5}}/>
@@ -252,9 +292,7 @@ export default class GuestMain extends Component{
             </TouchableHighlight>
 
 
-            <TouchableHighlight onPress={() => {
-                AsyncStorage.setItem('uid_store',null);
-            }}>
+            <TouchableHighlight onPress={() => this.btn_DangXuat_Click()}>
               <View style={{flexDirection:'row',borderBottomWidth:1,borderBottomColor:'#BDBDBD',height:55}}>
               <Image source={require('../img/logout.png')} style={{width:50,height:50,marginTop:3,marginLeft:5}}/>
               <Text style={{color:'black',fontSize:18,marginLeft:10,marginTop:15}}>Đăng xuất</Text>
@@ -272,6 +310,7 @@ export default class GuestMain extends Component{
 
       );
     };
+
   }
   render(){
 
@@ -289,6 +328,13 @@ export default class GuestMain extends Component{
 
     );
   }
+  btn_DangXuat_Click(){
+    this.setModalVisible(false);
+    AsyncStorage.setItem('uid_store','0');//đăng xuất , lưu uid_store chứa uid user thành 0
+    this.props.propsNavigator.push({
+      screen:'Login'
+    });
+  }
   btn_DangNhap_Click(){
     this.props.propsNavigator.push({
       screen:'Login'
@@ -303,19 +349,37 @@ export default class GuestMain extends Component{
   btn_TinNhan_Click(){
     this.setModalVisible(!this.state.modalVisible);
     this.props.propsNavigator.push({
-      screen:'Messendger'
+      screen:'ListMessendger',
+      uidSession:this.state.user.uid
+    });
+  }
+  btn_Caidat_Click(){
+    this.setModalVisible(!this.state.modalVisible);
+    this.props.propsNavigator.push({
+      screen:'ListUser_Admin'
     });
   }
   btn_CuaHang_Click(){
     this.setModalVisible(!this.state.modalVisible);
     this.props.propsNavigator.push({
-      screen:'ListShops'
+      screen:'ListShops',//chạy tới màn hình tiếp
+      userSession:{//gửi thông tin user qua màn hình tiếp theo, thấy sida chưa
+        us_hovaten:this.state.user.hovaten,
+        us_uid:this.state.user.uid,
+        us_sdt:this.state.user.sdt,
+        us_diachi:this.state.user.diachi,
+        us_anhbia:this.state.user.anhbia,
+        us_anhdaidien:this.state.user.anhdaidien,
+        us_email:this.state.user.email
+      }
     });
   }
   btn_CaNhan_Click(){
     this.setModalVisible(!this.state.modalVisible);
     this.props.propsNavigator.push({
-      screen:'InfoPersonal'
+      screen:'InfoPersonal',
+      //làm đi, gửi uidSession qua, thôi để tui làm mẫu, chưa có chổ nào làm đâu mà tìm
+      uidSession:this.state.user.uid
     });
   }
 

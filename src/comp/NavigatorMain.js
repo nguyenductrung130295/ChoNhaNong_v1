@@ -67,7 +67,7 @@ export default class NavigatorChuyenTrang extends Component{
         break;
 
       case 'AddPostNew':
-          return <AddPostNew propsNavigator={navigator}/>
+          return <AddPostNew propsNavigator={navigator} uidSession={uidSession}/>
           break;
       case 'Messendger':
           return <Messendger propsNavigator={navigator}/>

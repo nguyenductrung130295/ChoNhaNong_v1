@@ -91,14 +91,25 @@ export default class Messendger extends Component{
     insert_message=database.ref('db_marketsfarmers/table_messendgers');
     var d = new Date();//new time now
     var time = d.toString().slice(4,24);//cắt chuỗi thòi gian cần ngày thang năm giờ:phut:giay
-    insert_message.push({
-      uid_1:'-Ki-7FYal1djjUuPf8c6',//uid của user 1
-      uid_2:'-KhztO4GeK-W-l4VDzNb',//uid của user 2
+    //người gửi
+    insert_message.child('-Ki-7FYal1djjUuPf8c6')//uid 1
+    .child('-KhztO4GeK-W-l4VDzNb')//uid 2
+    .push({
       noidungtinnhan:this.state.txt_noidungtinnhan,//nội ding tin nhắn
       thoigiangui:time,//thời gian gửi tin nhắn
-      seen_1:true,//user 1 đã xem
-      seen_2:false,//user 2 đã xem
+      seen_1:true,//user 1 đã xem gửi
+      seen_2:false,//user 2 đã xem nhận
       sender:1// người gửi 1:uid_1, 2: là uid_2
+    });//sau khi gửi
+    //người nhận
+    insert_message.child('-KhztO4GeK-W-l4VDzNb')//uid 1 nhận
+    .child('-Ki-7FYal1djjUuPf8c6')//uid 2 gửi
+    .push({
+      noidungtinnhan:this.state.txt_noidungtinnhan,//nội ding tin nhắn
+      thoigiangui:time,//thời gian gửi tin nhắn
+      seen_1:false,//user 1 đã xem
+      seen_2:true,//user 2 đã xem
+      sender:2// người gửi 1:uid_1, 2: là uid_2
     },()=>this.AfterSendMessage());//sau khi gửi
   }
   AfterSendMessage(){

@@ -9,61 +9,8 @@ export default class InfoPersonal extends Component{
   constructor(props){
     super(props);
 
-    data=[
-      {
-        title:"Dinh Khung",
-        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
-        price:"120000",
-        time:"12-2-2017 15:00",
-        address:"Khanh Hoa"
-
-      },
-      {
-        title:"Trung Khung",
-        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
-        price:"120000",
-        time:"12-2-2017 15:00",
-        address:"Khanh Hoa"
-
-      },
-      {
-        title:"Dinh Khung",
-        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
-        price:"120000",
-        time:"12-2-2017 15:00",
-        address:"Khanh Hoa"
-
-      },
-      {
-        title:"Trung Khung",
-        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
-        price:"120000",
-        time:"12-2-2017 15:00",
-        address:"Khanh Hoa"
-
-      },
-      {
-        title:"Dinh Khung",
-        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
-        price:"120000",
-        time:"12-2-2017 15:00",
-        address:"Khanh Hoa"
-
-      },
-      {
-        title:"Trung Khung",
-        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
-        price:"120000",
-        time:"12-2-2017 15:00",
-        address:"Khanh Hoa"
-
-      }
-    ];
-
-
-    const ds=new ListView.DataSource({rowHasChanged:(r1,r2) => r1 !== r2});
     this.state={
-      dataSource:ds.cloneWithRows(data),
+      dataSource:null,
       imgyes:false,
       options:1,//1:bài đăng,2:thông tin,3:ảnh
       mysefl:false,
@@ -72,6 +19,7 @@ export default class InfoPersonal extends Component{
     }
   }
   componentWillMount(){
+
     database=firebase.database();
     tb_user=database.ref('db_marketsfarmers/table_users');
     us=new Users();
@@ -93,6 +41,62 @@ export default class InfoPersonal extends Component{
         alert('firebase error');
       }
   });
+
+  list_posts=[];
+  const ds=new ListView.DataSource({rowHasChanged:(r1,r2) => r1 !== r2});
+  table_hinhs=database.ref('db_marketsfarmers/table_hinhs');
+  tb_listposts=database.ref('db_marketsfarmers/table_posts');//trỏ đến chổ table_shops
+  tb_listposts.on('value',(snapshot)=>{
+    this.setState({dataSource:null});
+    snapshot.forEach((data)=>{
+
+      list_posts=[];//cứ mỗi lần thây đổi là phải set nó rỗng chứ ko nó sẽ lặp lại danh sách
+      linkhinh="";//tạm lưu
+      table_hinhs.orderByChild('idpost')
+      .equalTo(data.val().idpost).limitToFirst(1).on('value',(snaps)=>{
+        snaps.forEach((datahinh)=>{
+          //xong lấy link trong table_hinhs gán cho linkhinh
+          //bo trong nay cho no theo thu tu xu ly
+                  list_posts.push({//push đối tượng thông tin shops vào lítpost
+                    idpost:data.val().idpost,
+                    diachi_t:data.val().diachi_t,
+                    giaban:data.val().giaban,
+                    loaitien:data.val().loaitien,
+                    thoigiandang:data.val().thoigiandang,
+                    tieude:data.val().tieude,
+                    hinhpost:datahinh.val().linkpost
+                  });
+        });
+
+      });
+    });
+    //khi push xong hết rồi set nó vào dataSource của listview
+    this.setState({dataSource:ds.cloneWithRows(list_posts)});
+  });
+
+  }
+  renderList(){
+    if(this.state.dataSource!==null){
+      //con nho props ko ko hay lam
+      //been nay gui du lieu vao obj cho ItemListViewStatus
+      // zo ItemListViewStatus thif lay du lieu tu obj
+      //trong cai dataSource chua list_posts
+      //rowData trong ListView la  1 cai post
+      //nay baf lay cai nao thi ben kia lay cai do
+      return(
+        <ListView
+          dataSource={this.state.dataSource}
+          renderRow={(rowData)=>
+            <ItemListViewStatus propsNavigator={this.props.propsNavigator} obj={rowData}
+          ></ItemListViewStatus>}
+        />
+      );
+    }else if(this.state.dataSource===null){
+      return(
+        <View><Text>Waiting</Text></View>
+      );
+    }
+
   }
   yesImg(){
     if(this.state.imgyes){
@@ -145,7 +149,8 @@ export default class InfoPersonal extends Component{
                 bottom: 50,
                 right:20,}}><TouchableHighlight onPress={() => {
                   this.props.propsNavigator.push({
-                    screen:'AddPostNew'
+                    screen:'AddPostNew',
+                    uidSession:this.props.uidSession
                   });
                 }}>
 
@@ -178,13 +183,7 @@ export default class InfoPersonal extends Component{
       case 1:
           return(
             <View>
-            <ListView
-              dataSource={this.state.dataSource}
-              renderRow={(rowData)=><ItemListViewStatus obj={rowData}
-
-              ></ItemListViewStatus>}
-            />
-
+            {this.renderList()}
             </View>
           );
         break;

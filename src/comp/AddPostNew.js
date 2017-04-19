@@ -46,6 +46,7 @@ export default class AddPostNew extends Component{
     loai=['Trái cây','Gia súc'];//khởi tạo giá trị cho picker Loại sẩn phẩm đăng tin
     tinh=['Hà Nội','Nha Trang','Hồ Chí Minh','Cà Mau'];// picker chứa tỉnh thành phố
     this.state={
+      imageName:'',//tên file
       imagePath:'',//đường dẫn ảnh
       imageHeight:'',//chiều cao ảnh
       imageWidth:'',//rộng ảnh
@@ -64,6 +65,82 @@ export default class AddPostNew extends Component{
       valueMuaBan:'Bán',//chọn giá trị mua hoặc bán
     };
 
+  }
+  btn_Submit(){
+    //tui lưu cái danh sách hình trong this.state.arrayImage
+    //giờ mình in ra thử nó trước
+    //for(let i=0;i<this.state.arrayImage.length;i++){
+      //console.log(this.state.arrayImage[i]);
+    //}
+    //khởi tạo dữ liệu firebase
+    database=firebase.database();
+    table_post=database.ref('db_marketsfarmers/table_posts');
+    var date = new Date();
+    var datepost = date.toISOString();
+    var idp="idp"+datepost.slice(0,12)+datepost.slice(14,16)+datepost.slice(17,19)+datepost.slice(20,24);
+    table_post.push({
+      idpost:idp,
+      tieude:this.state.txt_tieude,
+      noidung:this.state.txt_noidung,
+      loaisp:this.state.valueLoaiPicker,
+      diachi_txh:this.state.txt_diachi_txh,
+      diachi_t:this.state.valueTinhTPPicker,
+      thoigiandang:date.toString().slice(4,24),
+      giaban:this.state.txt_gia,
+      muahayban:this.state.valueMuaBan,
+      loaitien:this.state.valueTienPicker,
+      uid_own:this.props.uidSession,
+      idshop_own:'null'
+
+    },()=>{
+      //trỏ tới table_post
+      table_hinhs=database.ref('db_marketsfarmers/table_hinhs');
+      //upload danh sách hình vào
+      arrayTam=[];//mảng này để lưu id hình mới tạo
+
+      i=0;// id hình lỡ 2 hình cùng id
+      for(let i=0;i<this.state.arrayImage.length;i++){
+
+        //tạo tên mới theo thời gian quá haya
+        var d = new Date();
+        var n = d.toISOString();
+        var a,b,c,d1;
+        a=n.slice(0,12);
+        b=n.slice(14,16);
+        c=n.slice(17,19);
+        d1=n.slice(20,24);
+        n=a+b+c+d1;//tên file mới
+
+
+          //cái hàm uploadImage này là nó upload cái hình tại đường dẫn Path tên
+        uploadImage(this.state.arrayImage[i],n+".jpg").then((responseData)=>{
+          i++;
+          //mỗi lần upload 1 file lên sẽ trả về link URI image của
+          //ảnh đó về chứa trong responseData
+          table_hinhs.push({
+            idhinh:n+i,
+            linkpost:responseData,
+            idpost:idp
+          },()=>arrayTam.push(n+i));//lưu id hình mới tạo
+        }).done();
+        //console.log(this.state.arrayImage[i]);
+      }
+    });
+
+
+
+//    hàm upload ảnh vào storage trên firebase
+// khi nó upload xong sẽ trả về trả về responseData là cái link ảnh
+/*
+    uploadImage(this.state.imagePath,'KH4.jpg').then((responseData)=>{
+      KhachHang.child('KH4').set({
+        url:responseData,
+        age:'22',
+        firstname:this.state.firstname,
+        lastname:this.state.lastname,
+      });
+    }).done();
+    */
   }
   renderItemTinh(){
     //render picker Tỉnh thành phố ra màn hình
@@ -99,18 +176,7 @@ export default class AddPostNew extends Component{
     }
     return items;
   }
-  submit(){
-    const db=firebase.database();
-    const KhachHang=db.ref().child('Table_KhachHang');
-    uploadImage(this.state.imagePath,'KH4.jpg').then((responseData)=>{
-      KhachHang.child('KH4').set({
-        url:responseData,
-        age:'22',
-        firstname:this.state.firstname,
-        lastname:this.state.lastname,
-      });
-    }).done();
-  }
+
   openImagePicker(){
     const  options={
       title:'select avatar',
@@ -197,7 +263,10 @@ export default class AddPostNew extends Component{
           </Image></TouchableHighlight>}
           <View style={{padding:10,backgroundColor:'#E0E0E0'}}>
           {/* INPUT TIÊU ĐỀ BÀI ĐĂNG */}
-        <TextInput placeholder="Tiêu đề bài đăng" underlineColorAndroid="white" style={{backgroundColor:'white',fontSize:18,color:'black',height:45,borderWidth:1,borderColor:'#03A9F4',borderRadius:2}}/>
+        <TextInput placeholder="Tiêu đề bài đăng"
+        underlineColorAndroid="white"
+        onChangeText={(value)=>this.setState({txt_tieude:value})}
+        style={{backgroundColor:'white',fontSize:18,color:'black',height:45,borderWidth:1,borderColor:'#03A9F4',borderRadius:2}}/>
 
 
 
@@ -223,6 +292,7 @@ export default class AddPostNew extends Component{
           <View style={{flex:6}}>
           {/* INPUT GIÁ */}
           <TextInput underlineColorAndroid="white"
+          onChangeText={(value)=>this.setState({txt_gia:value})}
           style={{backgroundColor:'white',fontSize:18,color:'black',height:45,borderWidth:1,borderColor:'#03A9F4',borderRadius:2}} placeholder="Giá"/></View>
           <View style={{flex:4}}><View style={{backgroundColor:'white',borderWidth:1,borderColor:'#03A9F4',borderRadius:2,height:45,marginLeft:5}}>
 {/* PICKER LOẠI TIỀN */}
@@ -233,7 +303,9 @@ export default class AddPostNew extends Component{
         <View style={{flexDirection:'row',marginTop:5}}>
           <View style={{flex:6}}>
 {/* INPUT DIACHI THÔN XÃ HUYỆN */}
-          <TextInput underlineColorAndroid="white" style={{backgroundColor:'white',fontSize:18,color:'black',height:45,borderWidth:1,borderColor:'#03A9F4',borderRadius:2}} placeholder="Địa chỉ"/></View>
+          <TextInput underlineColorAndroid="white"
+          onChangeText={(value)=>this.setState({txt_diachi_txh:value})}
+          style={{backgroundColor:'white',fontSize:18,color:'black',height:45,borderWidth:1,borderColor:'#03A9F4',borderRadius:2}} placeholder="Địa chỉ"/></View>
           <View style={{flex:4}}><View style={{backgroundColor:'white',borderWidth:1,borderColor:'#03A9F4',borderRadius:2,height:45,marginLeft:5}}>
 {/* PICKER TỈNH THÀNH PHỐ */}
           <Picker selectedValue={this.state.valueTinhTPPicker}
@@ -245,13 +317,14 @@ export default class AddPostNew extends Component{
         <TextInput underlineColorAndroid="white"
         placeholder="Nội dung" multiline={true}
         numberOfLines = {8}
+        onChangeText={(value)=>this.setState({txt_noidung:value})}
         style={{backgroundColor:'white',marginTop:5,marginBottom:5,fontSize:18,color:'black',borderWidth:1,borderColor:'#03A9F4',borderRadius:2}}/>
         <View style={{flexDirection:'row'}}>
           <View style={{flex:1}}>
-            <Button onPress={()=>alert('click button')} title="Hủy bỏ" color='#FF3D00'/>
+            <Button onPress={()=>this.btn_Submit()} title="Hủy bỏ" color='#FF3D00'/>
           </View>
           <View style={{flex:3,marginLeft:10}}>
-              <Button onPress={()=>alert('click button')} title="Đăng bài"/>
+              <Button onPress={()=>this.btn_Submit()} title="Đăng bài"/>
           </View>
         </View>
 

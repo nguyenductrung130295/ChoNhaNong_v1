@@ -1,6 +1,5 @@
 import React,{Component} from 'react';
 import {AppRegistry,View,Text,TouchableHighlight,Picker,Button,Image} from 'react-native';
-
 export default class ItemListViewStatus extends Component{
   constructor(props){
     super(props);
@@ -14,18 +13,24 @@ export default class ItemListViewStatus extends Component{
         <TouchableHighlight onPress={()=>this.btn_ItemIsClick()}>
         <View style={{flexDirection:'row'}}>
         <View>
-          <Image source={{uri:this.props.obj.imgsrc}} style={{width: 100, height: 101,borderTopLeftRadius:2,borderBottomLeftRadius:2}}>
-          
+          <Image source={{uri:this.props.obj.hinhpost}} style={{width: 100, height: 101,borderTopLeftRadius:2,borderBottomLeftRadius:2}}>
+
           </Image>
         </View>
-        <View style={{marginLeft:8,padding:5}}>
-          <Text style={{color:'black',fontSize:16}}>{this.props.obj.title}</Text>
-          <Text style={{color:'red'}}>{this.props.obj.price} VND</Text>
-          <View style={{flexDirection:'row'}}>
-            <Text>{this.props.obj.time}</Text>
-            <Text>|</Text>
-            <Text>{this.props.obj.address}</Text>
-          </View>
+        <View style={{marginLeft:8,padding:5,flex:1}}>
+        <View style={{flex:3}}>
+          <Text style={{color:'blue',fontSize:16,fontWeight:'bold'}}>{this.props.obj.tieude}</Text>
+        </View>
+        <View style={{flex:1}}>
+          <Text style={{color:'red',fontSize:20}}>{this.props.obj.giaban} {this.props.obj.loaitien}</Text>
+        </View>
+        <View style={{flex:1}}>
+        <View style={{flexDirection:'row'}}>
+          <Text>{this.props.obj.thoigiandang}</Text>
+          <Text>  |  </Text>
+          <Text>{this.props.obj.diachi_t}</Text>
+        </View>
+        </View>
         </View>
         </View>
         </TouchableHighlight>

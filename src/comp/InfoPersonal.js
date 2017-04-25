@@ -5,17 +5,22 @@ import ItemShowAllImage from '../item_customer/ItemShowAllImage';
 import AddPostNew from './AddPostNew'
 import firebase from '../entities/FirebaseAPI'
 import Users from '../entities/Users'
+const ds=new ListView.DataSource({rowHasChanged:(r1,r2) => r1 !== r2});
+
 export default class InfoPersonal extends Component{
   constructor(props){
     super(props);
 
     this.state={
-      dataSource:null,
+      dataSource:ds.cloneWithRows([]),
       imgyes:false,
       options:1,//1:bài đăng,2:thông tin,3:ảnh
       mysefl:false,
       //false: là khách xem ,true: là ban than ca nhan ho xem minh
       user:new Users(),
+      backgrTab1:'#0288D150',
+      backgrTab2:'#0288D1',
+      backgrTab3:"#0288D1",
     }
   }
   componentWillMount(){
@@ -41,63 +46,58 @@ export default class InfoPersonal extends Component{
         alert('firebase error');
       }
   });
-
-  list_posts=[];
-  const ds=new ListView.DataSource({rowHasChanged:(r1,r2) => r1 !== r2});
+  idpostTam=' ';//post tạm để nếu post đó đã có thì ko lấy nữa
   table_hinhs=database.ref('db_marketsfarmers/table_hinhs');
   tb_listposts=database.ref('db_marketsfarmers/table_posts');//trỏ đến chổ table_shops
-  tb_listposts.on('value',(snapshot)=>{
-    this.setState({dataSource:null});
-    snapshot.forEach((data)=>{
+  var postTam=[];//tạm lưu 1 post hiện tại
+  table_hinhs.orderByChild('idpost')//xếp theo idpost trong table_hinhs
+  .on('value',(snaps)=>{
+    snaps.forEach((datahinh)=>{
+      if(datahinh.val().idpost!==idpostTam){//idpost mới
+        idpostTam=datahinh.val().idpost;//gán vào để phân biệt post khác
+        tb_listposts.orderByChild('idpost_uid_own')//xếp theo idpost_uid_own
+        .equalTo(idpostTam+"_"+this.props.uidSession)//idpost_uid_own===idpostTam_uidsession
+        .on('value',(snapshot)=>{
+          snapshot.forEach((data)=>{
+            if(data.val().idshop_own==='null'){//của user đăng
+              flag=0;//chưa tồn tại post trong list
+              for(let i=0;i<postTam.length;i++){
+                if(postTam[i].idpost===data.val().idpost){
+                  //có tồn tại rồi, update lại thôi
+                  postTam[i].idpost=data.val().idpost;
+                  postTam[i].diachi_t=data.val().diachi_t;
+                  postTam[i].giaban=data.val().giaban;
+                  postTam[i].loaitien=data.val().loaitien;
+                  postTam[i].thoigiandang=data.val().thoigiandang;
+                  postTam[i].tieude=data.val().tieude;
+                  postTam[i].linkhinh=datahinh.val().linkpost;
+                  flag=1;//báo có tồn tại
+                }
+              }
+              if(flag===0){//không tồn tại, thêm mới post vào
+                postTam.push({
+                  idpost:data.val().idpost,
+                  diachi_t:data.val().diachi_t,
+                  giaban:data.val().giaban,
+                  loaitien:data.val().loaitien,
+                  thoigiandang:data.val().thoigiandang,
+                  tieude:data.val().tieude,
+                  linkhinh:datahinh.val().linkpost
+                });
+              }
+            }
 
-      list_posts=[];//cứ mỗi lần thây đổi là phải set nó rỗng chứ ko nó sẽ lặp lại danh sách
-      linkhinh="";//tạm lưu
-      table_hinhs.orderByChild('idpost')
-      .equalTo(data.val().idpost).limitToFirst(1).on('value',(snaps)=>{
-        snaps.forEach((datahinh)=>{
-          //xong lấy link trong table_hinhs gán cho linkhinh
-          //bo trong nay cho no theo thu tu xu ly
-                  list_posts.push({//push đối tượng thông tin shops vào lítpost
-                    idpost:data.val().idpost,
-                    diachi_t:data.val().diachi_t,
-                    giaban:data.val().giaban,
-                    loaitien:data.val().loaitien,
-                    thoigiandang:data.val().thoigiandang,
-                    tieude:data.val().tieude,
-                    hinhpost:datahinh.val().linkpost
-                  });
+
+          });
+          //thêm vào datasource cho listView in ra
+          this.setState({dataSource:ds.cloneWithRows(postTam)});
+          //alert(this.state.dataSource.length);
         });
-
-      });
+      }
     });
-    //khi push xong hết rồi set nó vào dataSource của listview
-    this.setState({dataSource:ds.cloneWithRows(list_posts)});
-  });
-
+    });
   }
-  renderList(){
-    if(this.state.dataSource!==null){
-      //con nho props ko ko hay lam
-      //been nay gui du lieu vao obj cho ItemListViewStatus
-      // zo ItemListViewStatus thif lay du lieu tu obj
-      //trong cai dataSource chua list_posts
-      //rowData trong ListView la  1 cai post
-      //nay baf lay cai nao thi ben kia lay cai do
-      return(
-        <ListView
-          dataSource={this.state.dataSource}
-          renderRow={(rowData)=>
-            <ItemListViewStatus propsNavigator={this.props.propsNavigator} obj={rowData}
-          ></ItemListViewStatus>}
-        />
-      );
-    }else if(this.state.dataSource===null){
-      return(
-        <View><Text>Waiting</Text></View>
-      );
-    }
 
-  }
   yesImg(){
     if(this.state.imgyes){
       return(
@@ -136,10 +136,10 @@ export default class InfoPersonal extends Component{
         </View>
 
         <View style={{flex:2,backgroundColor:'#E0E0E0'}}>
-        <View style={{flexDirection:'row',height:40,backgroundColor:'#0288D1'}}>
-          <View style={{flex:1,justifyContent:'center',alignItems:'center'}}><Text style={{color:'white',fontSize:18}} onPress={()=>this.btn_ShowTabBaiDang()}>Bài Đăng</Text></View>
-          <View style={{flex:1,justifyContent:'center',alignItems:'center'}}><Text style={{color:'white',fontSize:18}} onPress={()=>this.btn_ShowTabThongTin()}>Thông Tin</Text></View>
-          <View style={{flex:1,justifyContent:'center',alignItems:'center'}}><Text style={{color:'white',fontSize:18}} onPress={()=>this.btn_ShowTabAnh()}>Ảnh</Text></View>
+        <View style={{flexDirection:'row',height:40}}>
+          <View style={{flex:1,justifyContent:'center',alignItems:'center',backgroundColor:this.state.backgrTab1}}><Text style={{color:'white',fontSize:18}} onPress={()=>this.btn_ShowTabBaiDang()}>Bài Đăng</Text></View>
+          <View style={{flex:1,justifyContent:'center',alignItems:'center',backgroundColor:this.state.backgrTab2}}><Text style={{color:'white',fontSize:18}} onPress={()=>this.btn_ShowTabThongTin()}>Thông Tin</Text></View>
+          <View style={{flex:1,justifyContent:'center',alignItems:'center',backgroundColor:this.state.backgrTab3}}><Text style={{color:'white',fontSize:18}} onPress={()=>this.btn_ShowTabAnh()}>Ảnh</Text></View>
         </View>
         <View style={{height:1,backgroundColor:'#9E9E9Ed4'}}></View>
         <View style={{height:2,backgroundColor:'#BDBDBDc4'}}></View>
@@ -150,7 +150,8 @@ export default class InfoPersonal extends Component{
                 right:20,}}><TouchableHighlight onPress={() => {
                   this.props.propsNavigator.push({
                     screen:'AddPostNew',
-                    uidSession:this.props.uidSession
+                    uidSession:this.props.uidSession,
+                    sid:'0'
                   });
                 }}>
 
@@ -183,7 +184,13 @@ export default class InfoPersonal extends Component{
       case 1:
           return(
             <View>
-            {this.renderList()}
+              <ListView
+                dataSource={this.state.dataSource}
+                enableEmptySections={true}
+                renderRow={(rowData)=>
+                  <ItemListViewStatus uidSession={this.props.uidSession} propsNavigator={this.props.propsNavigator} obj={rowData}
+                ></ItemListViewStatus>}
+              />
             </View>
           );
         break;
@@ -256,12 +263,15 @@ export default class InfoPersonal extends Component{
   }
   btn_ShowTabBaiDang(){
     this.setState({options:1});
+    this.setState({backgrTab1:'#0288D150',backgrTab2:'#0288D1',backgrTab3:'#0288D1'});
   }
   btn_ShowTabThongTin(){
 this.setState({options:2});
+this.setState({backgrTab1:'#0288D1',backgrTab2:'#0288D150',backgrTab3:'#0288D1'});
   }
   btn_ShowTabAnh(){
 this.setState({options:3});
+this.setState({backgrTab1:'#0288D1',backgrTab2:'#0288D1',backgrTab3:'#0288D150'});
   }
   btn_Back_Click(){
     this.props.propsNavigator.pop();

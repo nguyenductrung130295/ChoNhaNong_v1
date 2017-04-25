@@ -25,20 +25,21 @@ export default class ListShops extends Component{
     //khởi tạo dữ liệu firebase lấy danh sách shops
     database=firebase.database();
     tb_listshop=database.ref('db_marketsfarmers/table_shops');//trỏ đến chổ table_shops
-    tb_listshop.on('value',(snapshot)=>{
+    tb_listshop.orderByChild('user_own').equalTo(this.props.uidSession)
+    .on('value',(snapshot)=>{
       list_shop=[];//cứ mỗi lần thây đổi là phải set nó rỗng chứ ko nó sẽ lặp lại danh sách
       snapshot.forEach((data)=>{
         list_shop.push({//push đối tượng thông tin shops vào list_shop
           shopid:data.key,
           tencuahang:data.val().tencuahang,
           loaisp:data.val().loaisp,
-          diachi_txh:data.val().diachi_txh,
-          diachi_t:data.val().diachi_t,
-          sdtcuahang:data.val().sdtcuahang,
-          score_star:data.val().score_star,
+          //diachi_txh:data.val().diachi_txh,
+          //diachi_t:data.val().diachi_t,
+          //sdtcuahang:data.val().sdtcuahang,
+          //score_star:data.val().score_star,
           logoshop:data.val().logoshop,
-          anhbiashop:data.val().anhbiashop,
-          user_own:data.val().user_own,
+          //anhbiashop:data.val().anhbiashop,
+          //user_own:data.val().user_own,
         });
 
       });
@@ -63,7 +64,8 @@ export default class ListShops extends Component{
       score_star:'0',//số sao đánh giá
       anhbiashop:'https://firebasestorage.googleapis.com/v0/b/nodejsdemo-d89c7.appspot.com/o/photos%2Fbanner_users%2Fthiennhiendep201633.jpg?alt=media&token=43daf4e8-8d4c-4203-a355-5b121223095c',
       logoshop:'https://firebasestorage.googleapis.com/v0/b/nodejsdemo-d89c7.appspot.com/o/photos%2Flogo_shops%2Fshops.png?alt=media&token=53c1c3ca-bab4-4a05-94f5-5fbe38972131',
-      user_own:this.props.us_uid,//user chủ sở hữu cửa hàng
+      user_own:this.props.uidSession,//user chủ sở hữu cửa hàng
+      gioithieu:''
     },()=>alert('thành công'));// hiện thông báo sau khi làm push xong
   }
   setModalVisible(visible) {
@@ -74,7 +76,7 @@ export default class ListShops extends Component{
       return(
         <ListView
           dataSource={this.state.dataSource}
-          renderRow={(rowData)=><ItemShop propsNavigator={this.props.propsNavigator} obj={rowData}
+          renderRow={(rowData)=><ItemShop uidSession={this.props.uidSession} sid={rowData.shopid} propsNavigator={this.props.propsNavigator} obj={rowData}
           ></ItemShop>}
         />
       );

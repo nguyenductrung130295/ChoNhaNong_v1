@@ -2,7 +2,6 @@ import React,{Component} from 'react'
 import {Text,ListView,AppRegistry,TouchableHighlight,Image,View,Modal,TextInput,Picker,Button} from 'react-native'
 import ItemListMessendger from '../item_customer/ItemListMessendger'
 import firebase from '../entities/FirebaseAPI'
-import Shops from '../entities/Shops'
 export default class ListMessendger extends Component{
 
   constructor(props){
@@ -11,39 +10,56 @@ export default class ListMessendger extends Component{
     this.state={
       dataSource:null,//datasource cho ListView
       modalVisible: false,//ẩn hiện modal tạo cửa hàng mới
-      txt_tencuahangmoi:'',//tên cửa hàng mới
-      diachi_t:'Hà Nội',//value địa chỉ, thành phố default
-      loaisp:'Trái cây',//value loại sản phẩm cửa hàng mặc định
+      txt_sdt_user:'',//input tìm kiếm user qua số điện thoại
+      ten_user_found:'',//tên user tìm được,
+      uid_user_found:'-1',//uid user tìm được,nếu bằng trừ 1 thì ko render,0 thì render tìm ko thấy,khác cả 2 thì tìm thấy
     };
   }
   //hàm này chạy trước khi render ra màn hình
   componentWillMount(){
     //list shops: danh sách shops rỗng, là mảng các đối tượng shops
-    list_shop=[];
+    list_inbox=[];
     const ds=new ListView.DataSource({rowHasChanged:(r1,r2) => r1 !== r2});
     //alert(this.props.us_uid);
     //khởi tạo dữ liệu firebase lấy danh sách shops
     database=firebase.database();
-    tb_listshop=database.ref('db_marketsfarmers/table_shops');//trỏ đến chổ table_shops
-    tb_listshop.on('value',(snapshot)=>{
-      list_shop=[];//cứ mỗi lần thây đổi là phải set nó rỗng chứ ko nó sẽ lặp lại danh sách
-      snapshot.forEach((data)=>{
-        list_shop.push({//push đối tượng thông tin shops vào list_shop
-          shopid:data.key,
-          tencuahang:data.val().tencuahang,
-          loaisp:data.val().loaisp,
-          diachi_txh:data.val().diachi_txh,
-          diachi_t:data.val().diachi_t,
-          sdtcuahang:data.val().sdtcuahang,
-          score_star:data.val().score_star,
-          logoshop:data.val().logoshop,
-          anhbiashop:data.val().anhbiashop,
-          user_own:data.val().user_own,
+    tb_listshop=database.ref('db_marketsfarmers/table_messendgers');//trỏ đến chổ table_shops
+    tb_listshop.child(this.props.uidSession)//this.props.uidSession
+    .on('value',(snapshot)=>{
+
+      list_inbox=[];//cứ mỗi lần thây đổi là phải set nó rỗng chứ ko nó sẽ lặp lại danh sách
+      snapshot.forEach((data1)=>{
+
+        tb_detaiInbox=database.ref('db_marketsfarmers/table_messendgers/'+this.props.uidSession)
+        .child(data1.key).limitToLast(1);//uid2, user 2,ng nhận
+        tb_detaiInbox.on('value',(snapshot_detai)=>{
+          snapshot_detai.forEach((data_mess)=>{//
+
+            tb_user=database.ref('db_marketsfarmers/table_users');
+            tb_user.orderByKey().equalTo(data1.key).limitToLast(1)//uid2
+            .on('value',(snap)=>{
+              snap.forEach((data2)=>{//infor user 2
+                list_inbox.push({//push đối tượng thông tin shops vào list_shop
+                  uid_send:this.props.uidSession,
+                  hovaten_send:data2.val().hovaten,
+                  anhdaidien_send:data2.val().anhdaidien,
+                  noidung_last:data_mess.val().noidungtinnhan,
+                  seen_1:data_mess.val().seend_1,
+                  seen_2:data_mess.val().seend_2,
+                  sender:data_mess.val().sender,
+                  thoigiangui:data_mess.val().thoigiangui,
+                  uid_get:data1.key
+                });
+              });
+            this.setState({dataSource:ds.cloneWithRows(list_inbox)})
+          });
         });
+        });
+
 
       });
       //khi push xong hết rồi set nó vào dataSource của listview
-      this.setState({dataSource:ds.cloneWithRows(list_shop)})
+      //this.setState({dataSource:ds.cloneWithRows(list_inbox)})
     });
 
 
@@ -74,6 +90,7 @@ export default class ListMessendger extends Component{
       return(
         <ListView
           dataSource={this.state.dataSource}
+          enableEmptySections={true}
           renderRow={(rowData)=><ItemListMessendger propsNavigator={this.props.propsNavigator} obj={rowData}
           ></ItemListMessendger>}
         />
@@ -84,6 +101,28 @@ export default class ListMessendger extends Component{
       );
     }
 
+  }
+  btn_GuiTinNhan_Search(){
+    this.props.propsNavigator.push({
+      screen:'Messendger',
+      uidSession:this.props.uidSession,
+      uidGetMessage:this.state.uid_user_found
+    });
+  }
+  renderResultSearch(){
+    if(this.state.uid_user_found==='0'){
+      return(
+        <Text>Không tìm thấy</Text>
+      );
+    }else if(this.state.uid_user_found==='-1')
+    return null;
+    else if(this.state.uid_user_found!=='-1' &&this.state.uid_user_found!=='0' &&this.state.uid_user_found!==null){
+      return(
+        <View>
+          <Text onPress={()=>this.btn_GuiTinNhan_Search()}>{this.state.ten_user_found}</Text>
+        </View>
+      );
+    }
   }
   render(){
     return(
@@ -106,17 +145,35 @@ export default class ListMessendger extends Component{
       <View style={{flexDirection:'row',marginTop:5,marginBottom:5}}>
         <View style={{flex:5,paddingLeft:10}}>
           <TextInput placeholder="  Số điện thoại..."
-          style={{borderRadius:4,borderWidth:1,borderColor:'#BDBDBD',height:38,color:'black'}}/>
+          style={{borderRadius:4,borderWidth:1,borderColor:'#BDBDBD',height:38,color:'black'}}
+          onChangeText={(value)=>this.setState({txt_sdt_user:value})}
+          />
         </View>
         <View style={{flex:2,paddingLeft:10,paddingRight:10,paddingTop:1}}>
-          <Button title="Tìm kiếm" onPress={()=>alert('tìm')} color="orange"/>
+          <Button title="Tìm kiếm" onPress={()=>this.btn_TimKiemUserBySdt()} color="orange"/>
         </View>
 
       </View>
+      {this.renderResultSearch()}
       {this.renderList()}
 
       </View>
     );
+  }
+  btn_TimKiemUserBySdt(){
+
+    tb_user=database.ref('db_marketsfarmers/table_users');
+    tb_user.orderByChild('sdt').equalTo(this.state.txt_sdt_user).limitToLast(1)//uid2
+    .on('value',(snap)=>{
+      if(snap.exists()){
+        snap.forEach((data)=>{//infor user 2
+            this.setState({uid_user_found:data.key,ten_user_found:data.val().hovaten});
+        });
+      }else{
+        this.setState({uid_user_found:'0'});
+      }
+
+    });
   }
   btn_Back_Click(){
     this.props.propsNavigator.pop();

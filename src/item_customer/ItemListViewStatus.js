@@ -13,7 +13,7 @@ export default class ItemListViewStatus extends Component{
         <TouchableHighlight onPress={()=>this.btn_ItemIsClick()}>
         <View style={{flexDirection:'row'}}>
         <View>
-          <Image source={{uri:this.props.obj.hinhpost}} style={{width: 100, height: 101,borderTopLeftRadius:2,borderBottomLeftRadius:2}}>
+          <Image source={{uri:this.props.obj.linkhinh}} style={{width: 100, height: 101,borderTopLeftRadius:2,borderBottomLeftRadius:2}}>
 
           </Image>
         </View>
@@ -44,7 +44,9 @@ export default class ItemListViewStatus extends Component{
   }
   btn_ItemIsClick(){
     this.props.propsNavigator.push({
-      screen:'StatusDetail'
+      screen:'StatusDetail',
+      uidSession:this.props.uidSession,
+      idPost:this.props.obj.idpost
     });
   }
 

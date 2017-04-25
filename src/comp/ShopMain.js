@@ -3,68 +3,120 @@ import {AppRegistry,View,Image,Text,TouchableHighlight,ListView,Button,Modal} fr
 import ItemListViewStatus from '../item_customer/ItemListViewStatus';
 import ItemShowAllImage from '../item_customer/ItemShowAllImage'
 import AddPostNew from './AddPostNew'
+import firebase from '../entities/FirebaseAPI'
+import Shops from '../entities/Shops'
+import Users from '../entities/Users'
+const ds=new ListView.DataSource({rowHasChanged:(r1,r2) => r1 !== r2});
+const database=firebase.database();
+
 export default class ShopMain extends Component{
+
   constructor(props){
     super(props);
-    data=[
-      {
-        title:"Dinh Khung",
-        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
-        price:"120000",
-        time:"12-2-2017 15:00",
-        address:"Khanh Hoa"
-
-      },
-      {
-        title:"Trung Khung",
-        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
-        price:"120000",
-        time:"12-2-2017 15:00",
-        address:"Khanh Hoa"
-
-      },
-      {
-        title:"Dinh Khung",
-        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
-        price:"120000",
-        time:"12-2-2017 15:00",
-        address:"Khanh Hoa"
-
-      },
-      {
-        title:"Trung Khung",
-        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
-        price:"120000",
-        time:"12-2-2017 15:00",
-        address:"Khanh Hoa"
-
-      },
-      {
-        title:"Dinh Khung",
-        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
-        price:"120000",
-        time:"12-2-2017 15:00",
-        address:"Khanh Hoa"
-
-      },
-      {
-        title:"Trung Khung",
-        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
-        price:"120000",
-        time:"12-2-2017 15:00",
-        address:"Khanh Hoa"
-
-      }
-    ];
-    const ds=new ListView.DataSource({rowHasChanged:(r1,r2) => r1 !== r2});
     this.state={
-      dataSource:ds.cloneWithRows(data),
+      dataSource:ds.cloneWithRows([]),
       imgyes:false,
       options:1,//1:bài đăng,2:thông tin,3:ảnh
       mysefl:false,//false: là khách xem ,true: là ban than ca nhan ho xem minh
       modalVisible1: false,
-      modalVisible2: false
+      modalVisible2: false,
+      shop:new Shops(),
+      user_sohuu:new Users(),
     }
+  }
+  componentWillMount(){
+
+    tb_shop=database.ref('db_marketsfarmers/table_shops');
+    sh=new Shops();
+
+    tb_shop.orderByKey().equalTo(this.props.sid).on('value',(snap)=>{
+      if(snap.exists()){
+        snap.forEach((data)=>{
+          sh.shopid=data.key;
+          sh.tencuahang=data.val().tencuahang;
+          sh.loaisp=data.val().loaisp;
+          sh.diachi_txh=data.val().diachi_txh;
+          sh.diachi_t=data.val().diachi_t;
+          sh.sdtcuahang=data.val().sdtcuahang;
+          sh.score_star=data.val().score_star;
+          sh.logoshop=data.val().logoshop;
+          sh.anhbiashop=data.val().anhbiashop;
+          sh.user_own=data.val().user_own;
+        });
+        this.setState({shop:sh});
+        tb_user=database.ref('db_marketsfarmers/table_users');
+        us=new Users();
+        tb_user.orderByKey().equalTo(sh.user_own).on('value',(snap)=>{
+          if(snap.exists()){
+            snap.forEach((data)=>{
+              us.uid=data.key;
+              us.hovaten=data.val().hovaten;
+              us.sdt=data.val().sdt;
+              //us.diachi=data.val().diachi;
+              //us.email=data.val().email;
+              us.anhdaidien=data.val().anhdaidien;
+              //us.anhbia=data.val().anhbia;
+            });
+            this.setState({user:us});
+          }
+          else{
+            alert('firebase get user error');
+          }
+        });
+      }
+      else{
+        alert('firebase error');
+      }
+  });
+
+  idpostTam=' ';//post tạm để nếu post đó đã có thì ko lấy nữa
+  table_hinhs=database.ref('db_marketsfarmers/table_hinhs');
+  tb_listposts=database.ref('db_marketsfarmers/table_posts');//trỏ đến chổ table_shops
+  var postTam=[];//tạm lưu 1 post hiện tại
+  table_hinhs.orderByChild('idpost')//xếp theo idpost trong table_hinhs
+  .on('value',(snaps)=>{
+    snaps.forEach((datahinh)=>{
+      if(datahinh.val().idpost!==idpostTam){//idpost mới
+        idpostTam=datahinh.val().idpost;//gán vào để phân biệt post khác
+        tb_listposts.orderByChild('idshop_own')//xếp theo idpost_uid_own
+        .equalTo(this.props.sid)//===idshop_own?
+        .on('value',(snapshot)=>{
+          snapshot.forEach((data)=>{
+            flag=0;//chưa tồn tại post trong list
+
+            for(let i=0;i<postTam.length;i++){
+              if(postTam[i].idpost===data.val().idpost){
+                //có tồn tại rồi, update lại thôi
+                postTam[i].idpost=data.val().idpost;
+                postTam[i].diachi_t=data.val().diachi_t;
+                postTam[i].giaban=data.val().giaban;
+                postTam[i].loaitien=data.val().loaitien;
+                postTam[i].thoigiandang=data.val().thoigiandang;
+                postTam[i].tieude=data.val().tieude;
+                postTam[i].linkhinh=datahinh.val().linkpost;
+                flag=1;//báo có tồn tại
+              }
+            }
+            if(flag===0){//không tồn tại, thêm mới post vào
+              postTam.push({
+                idpost:data.val().idpost,
+                diachi_t:data.val().diachi_t,
+                giaban:data.val().giaban,
+                loaitien:data.val().loaitien,
+                thoigiandang:data.val().thoigiandang,
+                tieude:data.val().tieude,
+                linkhinh:datahinh.val().linkpost
+              });
+            }
+
+          });
+          //thêm vào datasource cho listView in ra
+          this.setState({dataSource:ds.cloneWithRows(postTam)});
+          //alert(this.state.dataSource.length);
+        });
+      }
+    });
+  });
   }
   setModalVisible1(visible) {
     this.setState({modalVisible1:visible});
@@ -88,7 +140,8 @@ export default class ShopMain extends Component{
     return(
       <View style={{flex:1}}>
         <View style={{flex:1}}>
-          <Image style={{width:'100%',height:'100%'}} source={require('../img/thaole.jpg')}>
+          <Image style={{width:'100%',height:'100%'}}
+          source={{uri:this.state.shop.anhbiashop}}>
           <View style={{flexDirection:'row',backgroundColor:'#00000030'}}>
 <View style={{flex:1}}><TouchableHighlight underlayColor='pink' onPress={()=>this.btn_Back_Click()}>
 <Image source={require('../img/ic_arrow_back_white_24dp.png')} style={{width:40,height:40,marginTop:5}}/>
@@ -104,19 +157,20 @@ export default class ShopMain extends Component{
           </View>
             <View style={{flexDirection:'row'}}>
               <View style={{flex:3}}>
-                <Image style={{width:100,height:100,borderRadius:5,borderWidth:2,borderColor:'white',marginLeft:15,marginTop:40}} source={require('../img/ngoctam.jpg')}/>
+                <Image style={{width:100,height:100,borderRadius:5,borderWidth:2,borderColor:'white',marginLeft:15,marginTop:40}}
+                source={{uri:this.state.shop.logoshop}}/>
               </View>
               <View style={{flex:1}}></View>
             </View>
 
             <View style={{flexDirection:'row',height:40,backgroundColor:'#00000030'}}>
             <View style={{flex:6}}>
-            <Text style={{marginLeft:10,marginTop:5,color:'white',fontSize:20}}>Cửa hàng Nho Tím
+            <Text style={{marginLeft:10,marginTop:5,color:'white',fontSize:20}}>{this.state.shop.tencuahang}
             </Text>
               </View>
               <View style={{flex:2,paddingRight:10,paddingBottom:3,flexDirection:'row'}}>
 <Image source={require('../img/ic_people_white_24dp.png')} style={{width:30,height:30,marginTop:5}}/>
-<Text style={{color:'white'}}>20.0000 {"\n"} theo dỏi</Text>
+<Text style={{color:'white'}}>20.0000 {"\n"} theo dõi</Text>
               </View>
             </View>
             </Image>
@@ -137,7 +191,9 @@ export default class ShopMain extends Component{
                 bottom: 50,
                 right:20,}}><TouchableHighlight onPress={() => {
                   this.props.propsNavigator.push({
-                    screen:'AddPostNew'
+                    screen:'AddPostNew',
+                    uidSession:this.props.uidSession,
+                    sid:this.props.sid
                   });
                 }}>
 
@@ -214,6 +270,7 @@ export default class ShopMain extends Component{
             <View>
             <ListView
               dataSource={this.state.dataSource}
+              enableEmptySections={true}
               renderRow={(rowData)=><ItemListViewStatus obj={rowData}
 
               ></ItemListViewStatus>}
@@ -231,7 +288,7 @@ export default class ShopMain extends Component{
           <Image source={require('../img/ic_star_black_24dp.png')} style={{width:40,height:40,marginRight:5}}/>
           <Image source={require('../img/ic_star_half_black_24dp.png')} style={{width:40,height:40,marginRight:5}}/>
           <Image source={require('../img/ic_star_border_black_24dp.png')} style={{width:40,height:40,marginRight:5}}/>
-          <Text style={{fontSize:18,fontWeight:'bold'}}> 4.5</Text>
+          <Text style={{fontSize:18,fontWeight:'bold'}}>{this.state.shop.score_star}</Text>
 
         </View>
         <View style={{height:30,marginLeft:10,flexDirection:'row',marginBottom:5,justifyContent:'center'}}>
@@ -240,9 +297,9 @@ export default class ShopMain extends Component{
         </View>
         <TouchableHighlight>
           <View style={{flexDirection:'row',margin:5,borderBottomWidth:1,borderBottomColor:'gray'}}>
-            <Image source={require('../img/thaole.jpg')} style={{width:30,height:30,marginRight:5}}/>
+            <Image source={require('../img/favorite.png')} style={{width:30,height:30,marginRight:5}}/>
             <Text style={{fontSize:18,fontWeight:'bold'}}>Lời giới thiệu: </Text>
-            <Text style={{fontSize:18}}>Anh đẹp trai to con</Text>
+            <Text style={{fontSize:18}}>{this.state.shop.gioithieu}</Text>
           </View>
         </TouchableHighlight>
 
@@ -250,28 +307,29 @@ export default class ShopMain extends Component{
           <View style={{flexDirection:'row',margin:5,borderBottomWidth:1,borderBottomColor:'gray'}}>
             <Image source={require('../img/thaole.jpg')} style={{width:30,height:30,marginRight:5}}/>
             <Text style={{fontSize:18,fontWeight:'bold'}}>Tên cửa hàng: </Text>
-            <Text style={{fontSize:18}}>Cửa hàng nho tím</Text>
+            <Text style={{fontSize:18}}>{this.state.shop.tencuahang}</Text>
           </View>
         </TouchableHighlight>
         <TouchableHighlight>
           <View style={{flexDirection:'row',margin:5,borderBottomWidth:1,borderBottomColor:'gray'}}>
             <Image source={require('../img/thaole.jpg')} style={{width:30,height:30,marginRight:5}}/>
 <Text style={{fontSize:18,fontWeight:'bold'}}>Số điện thoại: </Text>
-            <Text style={{fontSize:18}}>0987654321</Text>
+            <Text style={{fontSize:18}}>{this.state.shop.sdtcuahang}</Text>
           </View>
         </TouchableHighlight>
         <TouchableHighlight>
           <View style={{flexDirection:'row',margin:5,borderBottomWidth:1,borderBottomColor:'gray'}}>
             <Image source={require('../img/thaole.jpg')} style={{width:30,height:30,marginRight:5}}/>
 <Text style={{fontSize:18,fontWeight:'bold'}}>Địa chỉ: </Text>
-            <Text style={{fontSize:18}}>Xuân Nam-Diên Xuân -Diên Khánh-Khánh Hòa</Text>
+            <Text style={{fontSize:18}}>{this.state.shop.diachi_txh}-{this.state.shop.diachi_t}</Text>
           </View>
         </TouchableHighlight>
         <TouchableHighlight>
           <View style={{flexDirection:'row',margin:5,borderBottomWidth:1,borderBottomColor:'gray'}}>
-            <Image source={require('../img/thaole.jpg')} style={{width:30,height:30,marginRight:5}}/>
+            <Image source={{uri:this.state.user.anhdaidien}}
+            style={{width:30,height:30,marginRight:5}}/>
             <Text style={{fontSize:18,fontWeight:'bold'}}>Chủ sở hữu: </Text>
-            <Text style={{fontSize:18}}>Dinh Kiều</Text>
+            <Text style={{fontSize:18}}>{this.state.user.hovaten}</Text>
           </View>
         </TouchableHighlight>
         <Modal

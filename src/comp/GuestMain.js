@@ -1,9 +1,11 @@
 import React,{Component} from 'react';
-import {AsyncStorage,AppRegistry,View,
-  Modal,Text,TextInput,Item,TouchableHighlight,Picker,Button,Image,ListView} from 'react-native';
+import {Platform,AsyncStorage,AppRegistry,View,
+  Modal,Text,TextInput,Item,TouchableHighlight,Picker,PickerIOS,Button,Image,ListView} from 'react-native';
 import ItemListViewStatus from '../item_customer/ItemListViewStatus';
 import Users from '../entities/Users'
 import firebase from '../entities/FirebaseAPI';
+const ds=new ListView.DataSource({rowHasChanged:(r1,r2) => r1 !== r2});
+
 export default class GuestMain extends Component{
   constructor(props){
     super(props);//
@@ -11,68 +13,13 @@ export default class GuestMain extends Component{
     loai=['Trái cây','Gia súc'];
     tinh=['Hà Nội','Nha Trang','Hồ Chí Minh','Cà Mau'];
 
-    data=[
-      {
-        title:"Dinh Khung",
-        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
-        price:"120000",
-        time:"12-2-2017 15:00",
-        address:"Khanh Hoa"
-
-      },
-      {
-        title:"Dinh Khung",
-        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
-        price:"120000",
-        time:"12-2-2017 15:00",
-        address:"Khanh Hoa"
-
-      },
-      {
-        title:"Dinh Khung",
-        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
-        price:"120000",
-        time:"12-2-2017 15:00",
-        address:"Khanh Hoa"
-
-      },
-      {
-        title:"Trung Khung",
-        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
-        price:"120000",
-        time:"12-2-2017 15:00",
-        address:"Khanh Hoa"
-
-      },
-      {
-        title:"Trung Khung",
-        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
-        price:"120000",
-        time:"12-2-2017 15:00",
-        address:"Khanh Hoa"
-
-      },
-      {
-        title:"Trung Khung",
-        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
-        price:"120000",
-        time:"12-2-2017 15:00",
-        address:"Khanh Hoa"
-
-      },
-      {
-        title:"Trung Khung",
-        imgsrc:"https://scontent.fsgn2-2.fna.fbcdn.net/v/t1.0-1/c0.27.100.100/p100x100/16298502_1821740334734783_649746552886407600_n.jpg?oh=a82ab51c245047c0493edfc8a4252fac&oe=5930F951",
-        price:"120000",
-        time:"12-2-2017 15:00",
-        address:"Khanh Hoa"
-
-      }
-    ];
     const ds=new ListView.DataSource({rowHasChanged:(r1,r2) => r1 !== r2});
     this.state={
-      dataSource:ds.cloneWithRows(data),
-      modalVisible:false,//hiện ẩn modal menu
+      dataSource:ds.cloneWithRows([]),
+      modalVisible:false,
+      modalMuahaybanIOS:false,//hiện ẩn modal menu
+      modalLoaiSpIOS:false,//hiện ẩn modal menu
+      modalTinhTpIOS:false,//hiện ẩn modal menu
       uid:'-1',//
       selected1:'Mua',//mặc định
       selected2:'Trái cây',
@@ -112,6 +59,54 @@ export default class GuestMain extends Component{
       });
 
     }
+    idpostTam=' ';//post tạm để nếu post đó đã có thì ko lấy nữa
+    table_hinhs=database.ref('db_marketsfarmers/table_hinhs');
+    tb_listposts=database.ref('db_marketsfarmers/table_posts');//trỏ đến chổ table_shops
+    var postTam=[];//tạm lưu 1 post hiện tại
+    table_hinhs.orderByChild('idpost')//xếp theo idpost trong table_hinhs
+    .on('value',(snaps)=>{
+      snaps.forEach((datahinh)=>{
+        if(datahinh.val().idpost!==idpostTam){//idpost mới
+          idpostTam=datahinh.val().idpost;//gán vào để phân biệt post khác
+          tb_listposts//.orderByChild('idpost_uid_own')//xếp theo idpost_uid_own
+          //.equalTo(idpostTam+"_"+this.props.uidSession)//idpost_uid_own===idpostTam_uidsession
+          .on('value',(snapshot)=>{
+            snapshot.forEach((data)=>{
+              flag=0;//chưa tồn tại post trong list
+
+              for(let i=0;i<postTam.length;i++){
+                if(postTam[i].idpost===data.val().idpost){
+                  //có tồn tại rồi, update lại thôi
+                  postTam[i].idpost=data.val().idpost;
+                  postTam[i].diachi_t=data.val().diachi_t;
+                  postTam[i].giaban=data.val().giaban;
+                  postTam[i].loaitien=data.val().loaitien;
+                  postTam[i].thoigiandang=data.val().thoigiandang;
+                  postTam[i].tieude=data.val().tieude;
+                  postTam[i].linkhinh=datahinh.val().linkpost;
+                  flag=1;//báo có tồn tại
+                }
+              }
+              if(flag===0){//không tồn tại, thêm mới post vào
+                postTam.push({
+                  idpost:data.val().idpost,
+                  diachi_t:data.val().diachi_t,
+                  giaban:data.val().giaban,
+                  loaitien:data.val().loaitien,
+                  thoigiandang:data.val().thoigiandang,
+                  tieude:data.val().tieude,
+                  linkhinh:datahinh.val().linkpost
+                });
+              }
+
+            });
+            //thêm vào datasource cho listView in ra
+            this.setState({dataSource:ds.cloneWithRows(postTam)});
+            //alert(this.state.dataSource.length);
+          });
+        }
+      });
+});
   }
   renderItemBan(){
     items=[];
@@ -134,8 +129,190 @@ export default class GuestMain extends Component{
     }
     return items;
   }
+  renderItemBanIOS(){
+    items=[];
+    for(let item of muaban){
+      items.push(<PickerIOS.Item key={item} label={item} value={item}/>)
+    }
+    return items;
+  }
+  renderItemLoaiIOS(){
+    items=[];
+    for(let item of loai){
+      items.push(<PickerIOS.Item key={item} label={item} value={item}/>)
+    }
+    return items;
+  }
+  renderItemTinhIOS(){
+    items=[];
+    for(let item of tinh){
+      items.push(<PickerIOS.Item key={item} label={item} value={item}/>)
+    }
+    return items;
+  }
   setModalVisible(visible) {
     this.setState({modalVisible: visible});
+  }
+  render3PickerChoose(){
+    if(Platform.OS==='ios'){
+      return(
+
+        <View style={{flexDirection:'row',marginTop:5,marginBottom:5}}>
+  {/* PICKER BÁN MUA */}
+          <View style={{flex:3}}>
+          <View style={{marginLeft:5,backgroundColor:'#29b6f6',borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
+          <Text onPress={()=>this.setState({modalMuahaybanIOS:!this.state.modalMuahaybanIOS})}
+                style={{color:'white'}}>{this.state.selected1}</Text>
+          <Modal
+            animationType={"slide"}
+            transparent={true}
+            visible={this.state.modalMuahaybanIOS}
+            onRequestClose={() => alert("Modal has been closed.")}
+            >
+           <View style={{flex:1,backgroundColor:'#000000a0'}}>
+            <View style={{flex:2}}></View>
+            <View style={{flex:2}}>
+            <View style={{margin:20,backgroundColor:'white',borderRadius:5}}>
+            <View style={{flexDirection:'row',backgroundColor:'#0288D1'}}>
+              <View style={{flex:7}}>
+                <Text style={{fontSize:20,color:'white',marginLeft:10,marginTop:10}}>Mua hay ban</Text>
+              </View>
+              <View style={{flex:1}}>
+                <TouchableHighlight underlayColor='#E0F7FA' onPress={() => {
+                  this.setState({modalMuahaybanIOS:!this.state.modalMuahaybanIOS})
+                }} style={{width:40,height:40,marginTop:5,borderRadius:20}}><Image source={require('../img/ic_clear_white_24dp.png')} /></TouchableHighlight>
+              </View>
+            </View>
+            <View>
+              <PickerIOS selectedValue={this.state.selected1}
+              onValueChange={(value)=>this.setState({selected1:value})}>
+                {this.renderItemBanIOS()}
+              </PickerIOS>
+              </View>
+                <View style={{padding: 10}}>
+              <Button onPress={()=>this.btn_TaoCuaHangMoi_Click()} title={'Tạo cửa hàng'} color='#03A9F4'></Button>
+        </View>
+        </View>
+            </View>
+            <View style={{flex:2}}></View>
+           </View>
+          </Modal>
+          </View>
+
+          </View>
+  {/* PICKER LOẠI */}
+          <View style={{flex:4}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
+          <Text onPress={()=>this.setState({modalLoaiSpIOS:!this.state.modalLoaiSpIOS})}
+                style={{color:'white'}}>{this.state.selected2}</Text>
+          <Modal
+            animationType={"slide"}
+            transparent={true}
+            visible={this.state.modalLoaiSpIOS}
+            onRequestClose={() => alert("Modal has been closed.")}
+            >
+           <View style={{flex:1,backgroundColor:'#000000a0'}}>
+            <View style={{flex:1}}></View>
+            <View style={{flex:2}}>
+            <View style={{margin:20,backgroundColor:'white',borderRadius:5}}>
+            <View style={{flexDirection:'row',backgroundColor:'#0288D1'}}>
+              <View style={{flex:7}}>
+                <Text style={{fontSize:20,color:'white',marginLeft:10,marginTop:10}}>Loai San Pham</Text>
+              </View>
+              <View style={{flex:1}}>
+                <TouchableHighlight underlayColor='#E0F7FA' onPress={() => {
+                  this.setState({modalLoaiSpIOS:!this.state.modalLoaiSpIOS})
+                }} style={{width:40,height:40,marginTop:5,borderRadius:20}}><Image source={require('../img/ic_clear_white_24dp.png')} /></TouchableHighlight>
+              </View>
+            </View>
+
+            <View>
+            <PickerIOS selectedValue={this.state.selected2} onValueChange={(value)=>this.setState({selected2:value})}>
+              {this.renderItemLoaiIOS()}
+            </PickerIOS>
+            </View>
+
+                <View style={{padding: 10}}>
+
+              <Button onPress={()=>this.btn_TaoCuaHangMoi_Click()} title={'Tạo cửa hàng'} color='#03A9F4'></Button>
+          </View>
+          </View>
+            </View>
+            <View style={{flex:1}}></View>
+           </View>
+          </Modal>
+          </View>
+          </View>
+  {/* PICKER TỈNH THÀNH PHỐ */}
+          <View style={{flex:5}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',marginRight:5,borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
+          <Text onPress={()=>this.setState({modalTinhTpIOS:!this.state.modalTinhTpIOS})}
+                style={{color:'white'}}>{this.state.selected3}</Text>
+          <Modal
+            animationType={"slide"}
+            transparent={true}
+            visible={this.state.modalTinhTpIOS}
+            onRequestClose={() => alert("Modal has been closed.")}
+            >
+           <View style={{flex:1,backgroundColor:'#000000a0'}}>
+            <View style={{flex:1}}></View>
+            <View style={{flex:2}}>
+            <View style={{margin:20,backgroundColor:'white',borderRadius:5}}>
+            <View style={{flexDirection:'row',backgroundColor:'#0288D1'}}>
+              <View style={{flex:7}}>
+                <Text style={{fontSize:20,color:'white',marginLeft:10,marginTop:10}}>Tinh thanh pho</Text>
+              </View>
+              <View style={{flex:1}}>
+                <TouchableHighlight underlayColor='#E0F7FA' onPress={() => {
+                  this.setState({modalTinhTpIOS:!this.state.modalTinhTpIOS})
+                }} style={{width:40,height:40,marginTop:5,borderRadius:20}}><Image source={require('../img/ic_clear_white_24dp.png')} /></TouchableHighlight>
+              </View>
+            </View>
+            <View>
+            <PickerIOS selectedValue={this.state.selected3} onValueChange={(value)=>this.setState({selected3:value})}>
+              {this.renderItemTinhIOS()}
+            </PickerIOS>
+            </View>
+
+                <View style={{padding: 10}}>
+
+              <Button onPress={()=>this.btn_TaoCuaHangMoi_Click()} title={'Tạo cửa hàng'} color='#03A9F4'></Button>
+          </View>
+          </View>
+            </View>
+            <View style={{flex:1}}></View>
+           </View>
+          </Modal>
+          </View>
+          </View>
+        </View>
+
+      )
+    }else{
+      return(
+
+        <View style={{flexDirection:'row',marginTop:5,marginBottom:5}}>
+  {/* PICKER BÁN MUA */}
+          <View style={{flex:3}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
+          <Picker style={{color:'white',height:30}} selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
+            {this.renderItemBan()}
+          </Picker></View>
+          </View>
+  {/* PICKER LOẠI */}
+          <View style={{flex:4}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
+          <Picker style={{color:'white',height:30}} mode='dropdown' selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
+            {this.renderItemLoai()}
+          </Picker></View>
+          </View>
+  {/* PICKER TỈNH THÀNH PHỐ */}
+          <View style={{flex:5}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',marginRight:5,borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
+          <Picker style={{color:'white',height:30}}rr selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
+            {this.renderItemTinh()}
+          </Picker></View>
+          </View>
+        </View>
+
+      );
+    }
+
   }
   Logined(){
 
@@ -154,26 +331,7 @@ export default class GuestMain extends Component{
 {/* ICON BUTTON ACCOUNT */}
           <View style={{flex:1}}><TouchableHighlight underlayColor='#E0F7FA' onPress={()=>this.btn_DangNhap_Click()} style={{width:40,height:40,marginTop:5,borderRadius:20}}><Image source={require('../img/ic_person_white_24dp.png')} /></TouchableHighlight></View>
         </View>
-        <View style={{flexDirection:'row',marginTop:5,marginBottom:5}}>
-{/* PICKER BÁN MUA */}
-          <View style={{flex:3}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
-          <Picker style={{color:'white',height:30}} selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
-            {this.renderItemBan()}
-          </Picker></View>
-          </View>
-{/* PICKER LOẠI */}
-          <View style={{flex:4}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
-          <Picker style={{color:'white',height:30}} mode='dropdown' selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
-            {this.renderItemLoai()}
-          </Picker></View>
-          </View>
-{/* PICKER TỈNH THÀNH PHỐ */}
-          <View style={{flex:5}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',marginRight:5,borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
-          <Picker style={{color:'white',height:30}}rr selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
-            {this.renderItemTinh()}
-          </Picker></View>
-          </View>
-        </View>
+        {this.render3PickerChoose()}
         <View style={{height:1,backgroundColor:'#9E9E9Ed4'}}></View>
         <View style={{height:2,backgroundColor:'#BDBDBDc4'}}></View>
         <View style={{height:2,backgroundColor:'#E0E0E0'}}></View>
@@ -198,26 +356,7 @@ export default class GuestMain extends Component{
 {/* ICON BUTTON RING */}
           <View style={{flex:1}}><TouchableHighlight underlayColor='#E0F7FA' onPress={()=>this.btn_DangNhap_Click()} style={{width:40,height:40,marginTop:5,borderRadius:20}}><Image source={require('../img/ic_notifications_none_white_24dp.png')} /></TouchableHighlight></View>
         </View>
-        <View style={{flexDirection:'row',marginTop:5,marginBottom:5}}>
-{/* PICKER BÁN MUA */}
-          <View style={{flex:3}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
-          <Picker style={{color:'white',height:30}} selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
-            {this.renderItemBan()}
-          </Picker></View>
-          </View>
-{/* PICKER LOẠI */}
-          <View style={{flex:4}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
-          <Picker style={{color:'white',height:30}} mode='dropdown' selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
-            {this.renderItemLoai()}
-          </Picker></View>
-          </View>
-{/* PICKER TỈNH THÀNH PHỐ */}
-          <View style={{flex:5}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',marginRight:5,borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
-          <Picker style={{color:'white',height:30}}rr selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
-            {this.renderItemTinh()}
-          </Picker></View>
-          </View>
-        </View>
+        {this.render3PickerChoose()}
         <View style={{height:1,backgroundColor:'#9E9E9Ed4'}}></View>
         <View style={{height:2,backgroundColor:'#BDBDBDc4'}}></View>
         <View style={{height:2,backgroundColor:'#E0E0E0'}}></View>
@@ -234,7 +373,7 @@ export default class GuestMain extends Component{
           <View style={{flex:2,backgroundColor:'#FFF9C4'}}>
           {/* load ảnh bìa, ảnh đại diện, tên người dùng vào menu  từ state.user đã lấy thông tin lúc nãy*/}
           <Image source={{uri:this.state.user.anhbia}} style={{width:'100%',height:150,borderBottomWidth:1,borderColor:'gray'}}>
-            <Image source={{uri:this.state.user.anhdaidien}} style={{width:80,height:80,marginTop:25,marginLeft:10,borderColor:'white',borderWidth:1,borderRadius:100}}/>
+            <Image source={{uri:this.state.user.anhdaidien}} style={{width:80,height:80,marginTop:25,marginLeft:10,borderColor:'white',borderWidth:1,borderRadius:40}}/>
             <Text style={{color:'white',fontSize:20,marginTop:5,marginLeft:10}}>{this.state.user.hovaten}</Text>
 </Image>
             <TouchableHighlight  onPress={()=>this.btn_TinNhan_Click()}>
@@ -320,6 +459,7 @@ export default class GuestMain extends Component{
 
       <ListView
         dataSource={this.state.dataSource}
+        enableEmptySections={true}
         renderRow={(rowData)=><ItemListViewStatus propsNavigator={this.props.propsNavigator} obj={rowData}
 
         ></ItemListViewStatus>}
@@ -363,15 +503,7 @@ export default class GuestMain extends Component{
     this.setModalVisible(!this.state.modalVisible);
     this.props.propsNavigator.push({
       screen:'ListShops',//chạy tới màn hình tiếp
-      userSession:{//gửi thông tin user qua màn hình tiếp theo, thấy sida chưa
-        us_hovaten:this.state.user.hovaten,
-        us_uid:this.state.user.uid,
-        us_sdt:this.state.user.sdt,
-        us_diachi:this.state.user.diachi,
-        us_anhbia:this.state.user.anhbia,
-        us_anhdaidien:this.state.user.anhdaidien,
-        us_email:this.state.user.email
-      }
+      uidSession:this.state.user.uid
     });
   }
   btn_CaNhan_Click(){

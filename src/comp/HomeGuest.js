@@ -1,20 +1,23 @@
 import React, {Component} from 'react';
-import {StyleSheet,Text,TouchableHighlight,TextInput,View,Image,Button,Picker,Item,StatusBar,AppRegistry} from 'react-native';
+import {Platform,PickerIOS,Modal,StyleSheet,Text,TouchableHighlight,TextInput,View,Image,Button,Picker,Item,StatusBar,AppRegistry} from 'react-native';
 export default class HomeGuest extends Component{
   constructor(props){
     super(props);
     muaban=['Mua','Bán'];
-    this.state={
-      selected:'Mua'
-    };
     loai=['Trái cây','Gia súc'];
-    this.state={
-      selected:'Trái cây'
-    };
     tinh=['Hà Nội','Nha Trang','Hồ Chí Minh','Cà Mau'];
     this.state={
-      selected:'Hà Nội'
-    }
+      //dataSource:ds.cloneWithRows([]),
+      //modalVisible:false,
+      modalMuahaybanIOS:false,//hiện ẩn modal menu
+      modalLoaiSpIOS:false,//hiện ẩn modal menu
+      modalTinhTpIOS:false,//hiện ẩn modal menu
+      //uid:'-1',//
+      selected1:'Mua',//mặc định
+      selected2:'Trái cây',
+      selected3:'Hồ Chí Minh',
+      //user:new Users(),//state là user mới có thể thay đổi dc
+    };
 
   }
   renderItemBan(){
@@ -37,6 +40,188 @@ export default class HomeGuest extends Component{
       items.push(<Picker.Item key={item} label={item} value={item}/>)
     }
     return items;
+  }
+  renderItemBanIOS(){
+    items=[];
+    for(let item of muaban){
+      items.push(<PickerIOS.Item key={item} label={item} value={item}/>)
+    }
+    return items;
+  }
+  renderItemLoaiIOS(){
+    items=[];
+    for(let item of loai){
+      items.push(<PickerIOS.Item key={item} label={item} value={item}/>)
+    }
+    return items;
+  }
+  renderItemTinhIOS(){
+    items=[];
+    for(let item of tinh){
+      items.push(<PickerIOS.Item key={item} label={item} value={item}/>)
+    }
+    return items;
+  }
+  render3PickerChoose(){
+    if(Platform.OS==='ios'){
+      return(
+
+        <View style={{flexDirection:'row',marginTop:5,marginBottom:5}}>
+  {/* PICKER BÁN MUA */}
+          <View style={{flex:3}}>
+          <View style={{marginLeft:5,backgroundColor:'#29b6f6',borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
+          <Text onPress={()=>this.setState({modalMuahaybanIOS:!this.state.modalMuahaybanIOS})}
+                style={{color:'white'}}>{this.state.selected1}</Text>
+          <Modal
+            animationType={"slide"}
+            transparent={true}
+            visible={this.state.modalMuahaybanIOS}
+            onRequestClose={() => alert("Modal has been closed.")}
+            >
+           <View style={{flex:1,backgroundColor:'#000000a0'}}>
+            <View style={{flex:2}}></View>
+            <View style={{flex:2}}>
+            <View style={{margin:20,backgroundColor:'white',borderRadius:5}}>
+            <View style={{flexDirection:'row',backgroundColor:'#0288D1'}}>
+              <View style={{flex:7}}>
+                <Text style={{fontSize:20,color:'white',marginLeft:10,marginTop:10}}>Mua hay ban</Text>
+              </View>
+              <View style={{flex:1}}>
+                <TouchableHighlight underlayColor='#E0F7FA' onPress={() => {
+                  this.setState({modalMuahaybanIOS:!this.state.modalMuahaybanIOS})
+                }} style={{width:40,height:40,marginTop:5,borderRadius:20}}><Image source={require('../img/ic_clear_white_24dp.png')} /></TouchableHighlight>
+              </View>
+            </View>
+            <View>
+              <PickerIOS selectedValue={this.state.selected1}
+              onValueChange={(value)=>this.setState({selected1:value})}>
+                {this.renderItemBanIOS()}
+              </PickerIOS>
+              </View>
+                <View style={{padding: 10}}>
+              <Button onPress={()=>this.btn_TaoCuaHangMoi_Click()} title={'Tạo cửa hàng'} color='#03A9F4'></Button>
+        </View>
+        </View>
+            </View>
+            <View style={{flex:2}}></View>
+           </View>
+          </Modal>
+          </View>
+
+          </View>
+  {/* PICKER LOẠI */}
+          <View style={{flex:4}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
+          <Text onPress={()=>this.setState({modalLoaiSpIOS:!this.state.modalLoaiSpIOS})}
+                style={{color:'white'}}>{this.state.selected2}</Text>
+          <Modal
+            animationType={"slide"}
+            transparent={true}
+            visible={this.state.modalLoaiSpIOS}
+            onRequestClose={() => alert("Modal has been closed.")}
+            >
+           <View style={{flex:1,backgroundColor:'#000000a0'}}>
+            <View style={{flex:1}}></View>
+            <View style={{flex:2}}>
+            <View style={{margin:20,backgroundColor:'white',borderRadius:5}}>
+            <View style={{flexDirection:'row',backgroundColor:'#0288D1'}}>
+              <View style={{flex:7}}>
+                <Text style={{fontSize:20,color:'white',marginLeft:10,marginTop:10}}>Loai San Pham</Text>
+              </View>
+              <View style={{flex:1}}>
+                <TouchableHighlight underlayColor='#E0F7FA' onPress={() => {
+                  this.setState({modalLoaiSpIOS:!this.state.modalLoaiSpIOS})
+                }} style={{width:40,height:40,marginTop:5,borderRadius:20}}><Image source={require('../img/ic_clear_white_24dp.png')} /></TouchableHighlight>
+              </View>
+            </View>
+
+            <View>
+            <PickerIOS selectedValue={this.state.selected2} onValueChange={(value)=>this.setState({selected2:value})}>
+              {this.renderItemLoaiIOS()}
+            </PickerIOS>
+            </View>
+
+                <View style={{padding: 10}}>
+
+              <Button onPress={()=>this.btn_TaoCuaHangMoi_Click()} title={'Tạo cửa hàng'} color='#03A9F4'></Button>
+          </View>
+          </View>
+            </View>
+            <View style={{flex:1}}></View>
+           </View>
+          </Modal>
+          </View>
+          </View>
+  {/* PICKER TỈNH THÀNH PHỐ */}
+          <View style={{flex:5}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',marginRight:5,borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
+          <Text onPress={()=>this.setState({modalTinhTpIOS:!this.state.modalTinhTpIOS})}
+                style={{color:'white'}}>{this.state.selected3}</Text>
+          <Modal
+            animationType={"slide"}
+            transparent={true}
+            visible={this.state.modalTinhTpIOS}
+            onRequestClose={() => alert("Modal has been closed.")}
+            >
+           <View style={{flex:1,backgroundColor:'#000000a0'}}>
+            <View style={{flex:1}}></View>
+            <View style={{flex:2}}>
+            <View style={{margin:20,backgroundColor:'white',borderRadius:5}}>
+            <View style={{flexDirection:'row',backgroundColor:'#0288D1'}}>
+              <View style={{flex:7}}>
+                <Text style={{fontSize:20,color:'white',marginLeft:10,marginTop:10}}>Tinh thanh pho</Text>
+              </View>
+              <View style={{flex:1}}>
+                <TouchableHighlight underlayColor='#E0F7FA' onPress={() => {
+                  this.setState({modalTinhTpIOS:!this.state.modalTinhTpIOS})
+                }} style={{width:40,height:40,marginTop:5,borderRadius:20}}><Image source={require('../img/ic_clear_white_24dp.png')} /></TouchableHighlight>
+              </View>
+            </View>
+            <View>
+            <PickerIOS selectedValue={this.state.selected3} onValueChange={(value)=>this.setState({selected3:value})}>
+              {this.renderItemTinhIOS()}
+            </PickerIOS>
+            </View>
+
+                <View style={{padding: 10}}>
+
+              <Button onPress={()=>this.btn_TaoCuaHangMoi_Click()} title={'Tạo cửa hàng'} color='#03A9F4'></Button>
+          </View>
+          </View>
+            </View>
+            <View style={{flex:1}}></View>
+           </View>
+          </Modal>
+          </View>
+          </View>
+        </View>
+
+      )
+    }else{
+      return(
+
+        <View style={{flexDirection:'row',marginTop:5,marginBottom:5}}>
+  {/* PICKER BÁN MUA */}
+          <View style={{flex:3}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
+          <Picker style={{color:'white',height:30}} selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
+            {this.renderItemBan()}
+          </Picker></View>
+          </View>
+  {/* PICKER LOẠI */}
+          <View style={{flex:4}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
+          <Picker style={{color:'white',height:30}} mode='dropdown' selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
+            {this.renderItemLoai()}
+          </Picker></View>
+          </View>
+  {/* PICKER TỈNH THÀNH PHỐ */}
+          <View style={{flex:5}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',marginRight:5,borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
+          <Picker style={{color:'white',height:30}}rr selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
+            {this.renderItemTinh()}
+          </Picker></View>
+          </View>
+        </View>
+
+      );
+    }
+
   }
   render(){
     return(
@@ -61,26 +246,7 @@ export default class HomeGuest extends Component{
 {/* ICON BUTTON ACCOUNT */}
           <View style={{flex:1}}><TouchableHighlight underlayColor='#E0F7FA' onPress={()=>this.btn_DangNhap_Click()} style={{width:40,height:40,marginTop:5,borderRadius:20}}><Image source={require('../img/ic_person_white_24dp.png')} /></TouchableHighlight></View>
         </View>
-        <View style={{flexDirection:'row',marginTop:5,marginBottom:5}}>
-{/* PICKER BÁN MUA */}
-          <View style={{flex:3}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
-          <Picker style={{color:'white',height:30}} selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
-            {this.renderItemBan()}
-          </Picker></View>
-          </View>
-{/* PICKER LOẠI */}
-          <View style={{flex:4}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
-          <Picker style={{color:'white',height:30}} mode='dropdown' selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
-            {this.renderItemLoai()}
-          </Picker></View>
-          </View>
-{/* PICKER TỈNH THÀNH PHỐ */}
-          <View style={{flex:5}}><View style={{marginLeft:5,backgroundColor:'#29b6f6',marginRight:5,borderRadius:3,borderColor:'#81D4FA',borderWidth:1}}>
-          <Picker style={{color:'white',height:30}}rr selectedValue={this.state.selected} onValueChange={(value)=>this.setState({selected:value})}>
-            {this.renderItemTinh()}
-          </Picker></View>
-          </View>
-        </View>
+        {this.render3PickerChoose()}
         </View>
         {/* SHADOW */}
                 <View style={{height:1,backgroundColor:'#9E9E9Ed4'}}></View>

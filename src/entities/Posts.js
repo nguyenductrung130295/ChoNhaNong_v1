@@ -1,4 +1,5 @@
 function Post(){
+  this.idpost=null;
   this.tieude=null;
   this.noidung=null;
   this.loaisp=null;
@@ -13,6 +14,7 @@ function Post(){
 }
 export default Post;
 /*
+idpost
 tieude
 noidung
 loaisp

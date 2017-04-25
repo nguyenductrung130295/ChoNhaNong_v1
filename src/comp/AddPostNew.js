@@ -78,6 +78,9 @@ export default class AddPostNew extends Component{
     var date = new Date();
     var datepost = date.toISOString();
     var idp="idp"+datepost.slice(0,12)+datepost.slice(14,16)+datepost.slice(17,19)+datepost.slice(20,24);
+    idshop_own='null';
+    if(this.props.sid!==0)//nếu #0 thì là shops đăng, ==0 là user đăng
+      idshop_own=this.props.sid;
     table_post.push({
       idpost:idp,
       tieude:this.state.txt_tieude,
@@ -90,7 +93,8 @@ export default class AddPostNew extends Component{
       muahayban:this.state.valueMuaBan,
       loaitien:this.state.valueTienPicker,
       uid_own:this.props.uidSession,
-      idshop_own:'null'
+      idshop_own:idshop_own,
+      idpost_uid_own:idp+"_"+this.props.uidSession
 
     },()=>{
       //trỏ tới table_post

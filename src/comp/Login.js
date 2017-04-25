@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import {AppRegistry,Text,TextInput,View, Button,Image,TouchableHighlight,AsyncStorage} from 'react-native';
+import {AppRegistry,Text,TextInput,View, Button,Image,TouchableHighlight,AsyncStorage,Platform} from 'react-native';
 import Users from '../entities/Users'
 import firebase from '../entities/FirebaseAPI';
 export default class Login extends Component {
@@ -63,6 +63,66 @@ export default class Login extends Component {
   btn_BackScreen_Click(){
     this.props.propsNavigator.pop();
   }
+  renderPlatformInput(){
+    if(Platform.OS==='ios'){
+      return(
+        <View style={{margin:15}}>
+          <Text style={{fontWeight:'bold',fontSize:20,color:'#01579B'}}>Số điện thoại</Text>
+  {/* INPUT  số diendj thoại*/}
+
+          <TextInput style={{borderRadius:5,backgroundColor:'white',fontSize:20,height:45}}
+          onChangeText={(value)=>this.setState({sdt:value})}/>
+
+          <View style={{flexDirection:'row',marginTop:7}}>
+            <View style={{flex:1}}><Text style={{fontWeight:'bold',fontSize:20,color:'#01579B',marginTop:7}}>Mật khẩu</Text></View>
+            <View style={{flex:2,alignItems:'flex-end'}}><Text style={{fontStyle:'italic',marginTop:7,fontSize:15,color:'#FF9800'}}>Quên mật khẩu?</Text></View>
+          </View>
+  {/* INPUT  mật khẩu  -underlineColorAndroid: màu gạch chân trong input,
+    onSubmitEditing: gọi hàm btn_DangNhap_Click() khi nhập xong password*/}
+
+          <TextInput secureTextEntry={true}
+          onSubmitEditing={()=>this.btn_DangNhap_Click()}
+          style={{borderRadius:5,backgroundColor:'white',fontSize:20,height:45}}
+           onChangeText={(value)=>this.setState({mk:value})}/>          
+          <View style={{height:35,width:'100%',flexDirection:'row',justifyContent:'center',backgroundColor:'#03A9F4',borderRadius:5,alignItems:'center',marginTop:15}}>
+            <TouchableHighlight onPress={()=>this.btn_DangNhap_Click()}>
+            <Text style={{fontSize:20,color:'white'}}>Đăng nhập</Text>
+            </TouchableHighlight>
+            </View>
+          <View style={{alignItems:'flex-end'}}>
+          <Text onPress={()=>this.btn_DangKy_Click()}  style={{fontStyle:'italic',marginTop:7,fontSize:20,color:'#FF9800'}}> Đăng ký tài khoản mới</Text></View>
+        </View>
+      );
+    }else{
+      return(
+        <View style={{margin:15}}>
+          <Text style={{fontWeight:'bold',fontSize:20,color:'#01579B'}}>Số điện thoại</Text>
+  {/* INPUT  số diendj thoại*/}
+
+          <TextInput style={{borderRadius:5,backgroundColor:'white',fontSize:20}}
+          underlineColorAndroid="white" onChangeText={(value)=>this.setState({sdt:value})}/>
+
+          <View style={{flexDirection:'row',marginTop:7}}>
+            <View style={{flex:1}}><Text style={{fontWeight:'bold',fontSize:20,color:'#01579B',marginTop:7}}>Mật khẩu</Text></View>
+            <View style={{flex:2,alignItems:'flex-end'}}><Text style={{fontStyle:'italic',marginTop:7,fontSize:15,color:'#FF9800'}}>Quên mật khẩu?</Text></View>
+          </View>
+  {/* INPUT  mật khẩu  -underlineColorAndroid: màu gạch chân trong input,
+    onSubmitEditing: gọi hàm btn_DangNhap_Click() khi nhập xong password*/}
+
+          <TextInput secureTextEntry={true}
+          onSubmitEditing={()=>this.btn_DangNhap_Click()}
+          style={{borderRadius:5,backgroundColor:'white',fontSize:20}}
+          underlineColorAndroid="white"
+           onChangeText={(value)=>this.setState({mk:value})}/>
+          <Text>{"\n"}</Text>
+          <Button onPress={()=>this.btn_DangNhap_Click()} title={'Đăng nhập'} color='#03A9F4'></Button>
+            <Text>{"\n"}</Text>
+          <View style={{alignItems:'flex-end'}}>
+          <Text onPress={()=>this.btn_DangKy_Click()}  style={{fontStyle:'italic',marginTop:7,fontSize:20,color:'#FF9800'}}> Đăng ký tài khoản mới</Text></View>
+        </View>
+      );
+    }
+  }
   render(){
     return(
       <View style={{flex:1,backgroundColor:'#B3E5FC'}}>
@@ -76,29 +136,7 @@ export default class Login extends Component {
 
       </View>
       <View style={{flex:1}}>
-      <View style={{margin:15}}>
-        <Text style={{fontWeight:'bold',fontSize:20,color:'#01579B'}}>Số điện thoại</Text>
-{/* INPUT  số diendj thoại*/}
-        <TextInput style={{borderRadius:5,backgroundColor:'white',fontSize:20}}
-        underlineColorAndroid="white" onChangeText={(value)=>this.setState({sdt:value})}/>
-
-        <View style={{flexDirection:'row',marginTop:7}}>
-          <View style={{flex:1}}><Text style={{fontWeight:'bold',fontSize:20,color:'#01579B',marginTop:7}}>Mật khẩu</Text></View>
-          <View style={{flex:2,alignItems:'flex-end'}}><Text style={{fontStyle:'italic',marginTop:7,fontSize:15,color:'#FF9800'}}>Quên mật khẩu?</Text></View>
-        </View>
-{/* INPUT  mật khẩu  -underlineColorAndroid: màu gạch chân trong input,
-  onSubmitEditing: gọi hàm btn_DangNhap_Click() khi nhập xong password*/}
-        <TextInput secureTextEntry={true}
-        onSubmitEditing={()=>this.btn_DangNhap_Click()}
-        style={{borderRadius:5,backgroundColor:'white',fontSize:20}}
-        underlineColorAndroid="white"
-         onChangeText={(value)=>this.setState({mk:value})}/>
-        <Text>{"\n"}</Text>
-        <Button onPress={()=>this.btn_DangNhap_Click()} title={'Đăng nhập'} color='#03A9F4'></Button>
-          <Text>{"\n"}</Text>
-        <View style={{alignItems:'flex-end'}}>
-        <Text onPress={()=>this.btn_DangKy_Click()}  style={{fontStyle:'italic',marginTop:7,fontSize:20,color:'#FF9800'}}> Đăng ký tài khoản mới</Text></View>
-      </View>
+      {this.renderPlatformInput()}
       </View>
       </View>
     );

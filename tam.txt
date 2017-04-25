@@ -1,0 +1,70 @@
+componentWillMount(){
+
+  database=firebase.database();
+  tb_user=database.ref('db_marketsfarmers/table_users');
+  us=new Users();
+
+  tb_user.orderByKey().equalTo(this.props.uidSession).on('value',(snap)=>{
+    if(snap.exists()){
+      snap.forEach((data)=>{
+        us.uid=data.key;
+        us.hovaten=data.val().hovaten;
+        us.sdt=data.val().sdt;
+        us.diachi=data.val().diachi;
+        us.email=data.val().email;
+        us.anhdaidien=data.val().anhdaidien;
+        us.anhbia=data.val().anhbia;
+      });
+      this.setState({user:us});
+    }
+    else{
+      alert('firebase error');
+    }
+});
+
+list_posts=[];
+list_hinhs=[];
+const ds=new ListView.DataSource({rowHasChanged:(r1,r2) => r1 !== r2});
+table_hinhs=database.ref('db_marketsfarmers/table_hinhs');
+tb_listposts=database.ref('db_marketsfarmers/table_posts');//trỏ đến chổ table_shops
+var idpost=[];
+
+
+
+tb_listposts.on('value',(snapshot)=>{
+  list_posts=[];//cứ mỗi lần thây đổi là phải set nó rỗng chứ ko nó sẽ lặp lại danh sách
+
+
+  snapshot.forEach((data)=>{
+
+    idpost.push(data.val().idpost);
+    list_posts.push({//push đối tượng thông tin shops vào lítpost
+      idpost:data.val().idpost,
+      diachi_t:data.val().diachi_t,
+      giaban:data.val().giaban,
+      loaitien:data.val().loaitien,
+      thoigiandang:data.val().thoigiandang,
+      tieude:data.val().tieude,
+      linkhinh:" "
+    });
+
+
+  });
+
+});
+let i=0;
+
+table_hinhs.orderByChild('idpost')
+.equalTo(idpost[i]).limitToFirst(1).on('value',(snaps)=>{
+  snaps.forEach((datahinh)=>{
+    //xong lấy link trong table_hinhs gán cho linkhinh
+    //bo trong nay cho no theo thu tu xu ly
+      //list_hinhs.push(datahinh.val().linkpost);
+      list_posts[i].linkhinh=datahinh.val().linkpost;
+      alert(list_posts[i].linkhinh);
+      i++;
+  });
+  //khi push xong hết rồi set nó vào dataSource của listview
+  this.setState({dataSource:ds.cloneWithRows(list_posts)});
+  });
+}

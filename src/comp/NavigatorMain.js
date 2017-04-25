@@ -54,23 +54,26 @@ export default class NavigatorChuyenTrang extends Component{
     let data=route.datanavi;//chưa xài, ai viết vậy
     let uidSession=route.uidSession;//uid là id của user  cũng để gửi dữ liệu qua 2 màn hình
     let userSession=route.userSession;//object user gửi dữ liệu user đang đăng nhập tới màn hình tiếp theo
+    let sid=route.sid;//sid là idshops
+    let uidGetMessage=route.uidGetMessage;//uid người nhận tin nhắn
+    let idPost=route.idPost;//id của post
     switch (name) {
       // hiển thị trang đầu tiên, chọn mua hoặc bán
       case 'ListShops':
-        return <ListShops propsNavigator={navigator}  {...userSession}/>
+        return <ListShops propsNavigator={navigator} uidSession={uidSession}/>
         break;
       case 'StatusDetail':
-        return <StatusDetail propsNavigator={navigator}/>
+        return <StatusDetail propsNavigator={navigator} uidSession={uidSession} idPost={idPost}/>
         break;
       case 'ShopMain':
-        return <ShopMain propsNavigator={navigator}/>
+        return <ShopMain propsNavigator={navigator} uidSession={uidSession} sid={sid}/>
         break;
 
       case 'AddPostNew':
-          return <AddPostNew propsNavigator={navigator} uidSession={uidSession}/>
+          return <AddPostNew propsNavigator={navigator} uidSession={uidSession} sid={sid}/>
           break;
       case 'Messendger':
-          return <Messendger propsNavigator={navigator}/>
+          return <Messendger propsNavigator={navigator} uidSession={uidSession} uidGetMessage={uidGetMessage}/>
           break;
       case 'InfoPersonal':
           return <InfoPersonal propsNavigator={navigator} uidSession={uidSession}/>
@@ -105,7 +108,7 @@ export default class NavigatorChuyenTrang extends Component{
       //user đã đăng xuất--> tới màn hình Login,đúng là màn hình HomeGuest,sửa sau
       return(
         <Navigator
-          initialRoute={{screen:'Login'}}
+          initialRoute={{screen:'HomeGuest'}}
           ref={navigator => {this.navigator = navigator}}
           renderScene={this._renderScene.bind(this)}
         />

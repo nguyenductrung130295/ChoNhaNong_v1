@@ -9,6 +9,7 @@ function Shops(){
   this.logoshop=null;
   this.anhbiashop=null;
   this.user_own=null;
+  this.gioithieu=null;
 }
 export default Shops;
 /*
@@ -22,4 +23,5 @@ score_star
 logoshop
 anhbiashop
 user_own
+gioithieu
 */

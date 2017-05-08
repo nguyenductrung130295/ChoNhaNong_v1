@@ -3,6 +3,8 @@ package com.chonhanong_v1;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.pilloxa.backgroundjob.BackgroundJobPackage;
+import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.imagepicker.ImagePickerPackage;
 import com.facebook.react.ReactNativeHost;
@@ -25,6 +27,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new BackgroundJobPackage(),
+            new ReactNativePushNotificationPackage(),
             new RNFetchBlobPackage(),
             new ImagePickerPackage()
       );

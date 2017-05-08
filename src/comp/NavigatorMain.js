@@ -36,9 +36,15 @@ export default class NavigatorChuyenTrang extends Component{
       };//giống cờ flag á,
 
       //hàm getItem lấy uid đã đăng nhập lưu trong key uid_store gán cho state.uid
-      AsyncStorage.getItem("uid_store").then((value) => {
-                  this.setState({"uid": value});
-              }).done();
+
+        AsyncStorage.getItem("uid_store").then((value) => {
+          if(value===null){
+            this.setState({"uid": '0'});
+          }else
+          this.setState({"uid": value});
+
+        }).done();
+
     }
 
     componentDidMount() {//cái hàm này của nút back trên android, gọi cái hàm ở trên,ko cần hiểu, biết là dc

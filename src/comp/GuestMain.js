@@ -4,6 +4,40 @@ import {Platform,AsyncStorage,AppRegistry,View,
 import ItemListViewStatus from '../item_customer/ItemListViewStatus';
 import Users from '../entities/Users'
 import firebase from '../entities/FirebaseAPI';
+var PushNotification = require('react-native-push-notification');
+
+import BackgroundJob from 'react-native-background-job';
+
+const backgroundJob = {
+ jobKey: "myJob",
+ job: () => RunBackground()
+};
+function RunBackground(){
+  var a="d";
+  database=firebase.database();
+  tb_cm=database.ref('db_marketsfarmers/table_notif');
+  tb_cm.orderByKey().limitToLast(1).on('value',(datasnapshot)=>{
+    datasnapshot.forEach((haha)=>{
+      if(haha.key!==a){
+        a=haha.key;
+        PushNotification.localNotification({
+          title: "Background Notification Title::"+a, // (optional, for iOS this is only used in apple watch, the title will be the app name on other iOS devices)
+        message: "Bacground Notification Message", // (required)
+          });
+      }
+    });
+
+
+  })
+
+}
+BackgroundJob.register(backgroundJob);
+var backgroundSchedule = {
+ jobKey: "myJob",
+ timeout: 5000
+}
+
+BackgroundJob.schedule(backgroundSchedule);
 const ds=new ListView.DataSource({rowHasChanged:(r1,r2) => r1 !== r2});
 
 export default class GuestMain extends Component{
@@ -481,7 +515,11 @@ export default class GuestMain extends Component{
     });
   }
   btn_TimKiem_Click(){
-    alert('button Tim Kiem is clicked');
+    //alert('button Tim Kiem is clicked');
+    PushNotification.localNotification({
+      title: "My Notification Title", // (optional, for iOS this is only used in apple watch, the title will be the app name on other iOS devices)
+    message: "My Notification Message", // (required)
+      });
   }
   btn_Menu_Click(){
     this.setModalVisible(true);

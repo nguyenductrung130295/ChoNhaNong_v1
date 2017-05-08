@@ -16,6 +16,7 @@ export default class Messendger extends Component{
         txt_noidungtinnhan:'',
         user_me:new Users(),
         user_you:new Users(),
+        leng:0
       };
 
   }
@@ -98,7 +99,13 @@ export default class Messendger extends Component{
 
 
                       });
-                this.setState({dataSource:ds.cloneWithRows(list_inbox)});
+                      if(this.state.leng<list_inbox.length){
+                        alert('new notification'+list_inbox.length);
+                      }else{
+                        alert('nônnonononono');
+                      }
+                this.setState({dataSource:ds.cloneWithRows(list_inbox),leng:list_inbox.length});
+
               });
                   }
                   else{

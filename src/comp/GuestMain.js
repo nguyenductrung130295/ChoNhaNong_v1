@@ -8,22 +8,29 @@ var PushNotification = require('react-native-push-notification');
 
 import BackgroundJob from 'react-native-background-job';
 
-const backgroundJob = {
- jobKey: "myJob",
- job: () => RunBackground()
-};
-function RunBackground(){
+function RunBackground(uid){
   var a="d";
   database=firebase.database();
-  tb_cm=database.ref('db_marketsfarmers/table_notif');
-  tb_cm.orderByKey().limitToLast(1).on('value',(datasnapshot)=>{
+  tb_cm=database.ref('db_marketsfarmers/table_notif/'+uid);
+  tb_cm.orderByChild('state').equalTo('dagui').on('value',(datasnapshot)=>{
+  //tb_cm.orderByKey().limitToLast(1).on('value',(datasnapshot)=>{
     datasnapshot.forEach((haha)=>{
       if(haha.key!==a){
         a=haha.key;
         PushNotification.localNotification({
-          title: "Background Notification Title::"+a, // (optional, for iOS this is only used in apple watch, the title will be the app name on other iOS devices)
-        message: "Bacground Notification Message", // (required)
+          title: haha.val().title, // (optional, for iOS this is only used in apple watch, the title will be the app name on other iOS devices)
+        message:haha.val().content, // (required)
           });
+        danhan=database.ref('db_marketsfarmers/table_notif/'+uid);
+        danhan.child(haha.key).set({
+          idpost:haha.val().idpost,
+          content:haha.val().content,
+          state:'danhan',
+          time:haha.val().time,
+          title:haha.val().title,
+          type:haha.val().type
+
+        });
       }
     });
 
@@ -31,13 +38,6 @@ function RunBackground(){
   })
 
 }
-BackgroundJob.register(backgroundJob);
-var backgroundSchedule = {
- jobKey: "myJob",
- timeout: 5000
-}
-
-BackgroundJob.schedule(backgroundSchedule);
 const ds=new ListView.DataSource({rowHasChanged:(r1,r2) => r1 !== r2});
 
 export default class GuestMain extends Component{
@@ -59,13 +59,48 @@ export default class GuestMain extends Component{
       selected2:'Trái cây',
       selected3:'Hồ Chí Minh',
       user:new Users(),//state là user mới có thể thay đổi dc
+
     };
 
+
+  }
+  RunNotification(uid){
+    //var a="d";
+    database=firebase.database();
+    tb_cm=database.ref('db_marketsfarmers/table_notif/'+uid);
+    tb_cm.orderByChild('state').equalTo('dagui').on('value',(datasnapshot)=>{
+    //tb_cm.orderByKey().limitToLast(1).on('value',(datasnapshot)=>{
+      datasnapshot.forEach((haha)=>{
+
+          //a=haha.key;
+          danhan=database.ref('db_marketsfarmers/table_notif/'+uid);
+          danhan.child(haha.key).set({
+            idpost:haha.val().idpost,
+            content:haha.val().content,
+            state:'danhan',
+            time:haha.val().time,
+            title:haha.val().title,
+            type:haha.val().type
+
+          },()=>
+            PushNotification.localNotification({
+              title: haha.val().title, // (optional, for iOS this is only used in apple watch, the title will be the app name on other iOS devices)
+            message:haha.val().content, // (required)
+              })
+          );
+
+
+
+      });
+
+
+    })
 
   }
   componentWillMount(){
     //kiểm tra uid session
     if(this.props.uidSession!=='0' && this.props.uidSession!=='-1'){//
+
       //khởi tạo firebase để lấy thông tin user từ uid đó
       database=firebase.database();
       tb_user=database.ref('db_marketsfarmers/table_users');
@@ -86,12 +121,38 @@ export default class GuestMain extends Component{
             });
             //sau khi lấy thông tin user ở code trên lưu vào state.user
             this.setState({user:us});
+            //BackgroundJob.cancelAll();
+            const backgroundJob = {
+              jobKey: "myJob",
+              job: () => RunBackground(this.props.uidSession)
+            };
+
+            BackgroundJob.register(backgroundJob);
+            BackgroundJob.getAll({callback: (jobs) =>{
+              //console.log(jobs,"------------------->",jobs.length);
+              if(typeof(jobs)!=='undefined'&& jobs.length===0){
+                //console.log("------------------->",jobs.length);
+
+                var backgroundSchedule = {
+                  //alwaysRunning:true,
+                  jobKey: "myJob",
+                  timeout: 5000
+                };
+
+                BackgroundJob.schedule(backgroundSchedule);
+              }
+
+            }
+            });
+
+
+
           }
           else{
             alert('firebase error');
           }
       });
-
+      this.RunNotification(this.props.uidSession);
     }
     idpostTam=' ';//post tạm để nếu post đó đã có thì ko lấy nữa
     table_hinhs=database.ref('db_marketsfarmers/table_hinhs');
@@ -141,6 +202,8 @@ export default class GuestMain extends Component{
         }
       });
 });
+
+
   }
   renderItemBan(){
     items=[];
@@ -494,7 +557,7 @@ export default class GuestMain extends Component{
       <ListView
         dataSource={this.state.dataSource}
         enableEmptySections={true}
-        renderRow={(rowData)=><ItemListViewStatus propsNavigator={this.props.propsNavigator} obj={rowData}
+        renderRow={(rowData)=><ItemListViewStatus uidSession={this.props.uidSession} propsNavigator={this.props.propsNavigator} obj={rowData}
 
         ></ItemListViewStatus>}
       />
@@ -508,6 +571,7 @@ export default class GuestMain extends Component{
     this.props.propsNavigator.push({
       screen:'Login'
     });
+    BackgroundJob.cancel({jobKey: 'myJob'});
   }
   btn_DangNhap_Click(){
     this.props.propsNavigator.push({

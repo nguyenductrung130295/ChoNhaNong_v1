@@ -21,5 +21,6 @@ import {
 
 
 //chạy navigator điều khiển chuyển trang đầu tiên
+//import Demo from './Demo';
 import NavigatorMain from './src/comp/NavigatorMain';
 AppRegistry.registerComponent('ChoNhaNong_v1', ()=>NavigatorMain);

@@ -18,6 +18,7 @@ export default class Register extends Component{
     database=firebase.database();
     //trỏ tới bảng table_users
     tb_user=database.ref('db_marketsfarmers/table_users');
+
     //tạo key-tương đương với id của một users, sdt là duy nhất
     tb_user.push({//số điện thoại ko trùng nhau
       //khi push đây, cái màu xanh lá cây sẽ lưu trên firebase luôn
@@ -31,11 +32,28 @@ export default class Register extends Component{
       email:'',//như trên
       anhbia:'https://firebasestorage.googleapis.com/v0/b/nodejsdemo-d89c7.appspot.com/o/photos%2Fbanner_users%2Fthiennhiendep201633.jpg?alt=media&token=43daf4e8-8d4c-4203-a355-5b121223095c',
       anhdaidien:'https://firebasestorage.googleapis.com/v0/b/nodejsdemo-d89c7.appspot.com/o/photos%2Favatar_users%2Fuserdefault.png?alt=media&token=e6ce673e-4f9e-4819-bd4a-ca3b2a85edf7'
-    },()=>this.props.propsNavigator.push({//push xong rồi chuyển sang màn hình guest,cái này phải lấy uid mới vừa đk để cho màn hình guestmain, mà chưa làm
-      screen:'GuestMain'
-    }));
-
-  }
+    },()=>{
+      var d = new Date();//new time now
+      var time = d.toString().slice(4,24);
+      tb_user.orderByChild('sdt_mk').equalTo(this.state.sdt+this.state.mk).once('value',(snap)=>{
+        snap.forEach((data)=>{
+          insert_noti=database.ref('db_marketsfarmers/table_notif/'+data.key);
+          insert_noti.child('1').set({
+            content:'Chào'+data.val().hovaten+' .Chúc mừng bạn đã đăng ký thành công.',
+            state:'dagui',
+            time:time,
+            title:'Đăng ký thành công',
+            type:'system'
+          },()=>
+            this.props.propsNavigator.push({//push xong rồi chuyển sang màn hình guest,cái này phải lấy uid mới vừa đk để cho màn hình guestmain, mà chưa làm
+            screen:'GuestMain',
+            uidSession:data.key
+          })
+          );
+        });
+      });
+  });
+}
   btn_BackScreen_Click(){
     this.props.propsNavigator.pop();
   }

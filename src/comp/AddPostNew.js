@@ -94,7 +94,12 @@ export default class AddPostNew extends Component{
       loaitien:this.state.valueTienPicker,
       uid_own:this.props.uidSession,
       idshop_own:idshop_own,
-      idpost_uid_own:idp+"_"+this.props.uidSession
+      idpost_uid_own:idp+"_"+this.props.uidSession,
+      command:{
+        0:{
+          defaul:'honggnuhnhuynhneyugn',          
+        }
+      }
 
     },()=>{
       //trỏ tới table_post

@@ -99,11 +99,6 @@ export default class Messendger extends Component{
 
 
                       });
-                      if(this.state.leng<list_inbox.length){
-                        alert('new notification'+list_inbox.length);
-                      }else{
-                        alert('nônnonononono');
-                      }
                 this.setState({dataSource:ds.cloneWithRows(list_inbox),leng:list_inbox.length});
 
               });
@@ -121,6 +116,7 @@ export default class Messendger extends Component{
   }
   btn_GuiTinNhanDi_Click(){
     database=firebase.database();
+
     insert_message=database.ref('db_marketsfarmers/table_messendgers');
     var d = new Date();//new time now
     var time = d.toString().slice(4,24);//cắt chuỗi thòi gian cần ngày thang năm giờ:phut:giay
@@ -135,6 +131,33 @@ export default class Messendger extends Component{
       sender:1// người gửi 1:uid_1, 2: là uid_2
     });//sau khi gửi
     //người nhận
+    //set thông báo
+    var flag=0;
+    notification=database.ref('db_marketsfarmers/table_notif/'+this.props.uidGetMessage);
+
+    notification.orderByKey().limitToLast(1).//once('value')
+  //.then(function(snap) {
+    on('value',(snap)=>{
+
+      snap.forEach((data)=>{
+        //console.log(flag+":"+parseInt(data.key));
+        if(flag!==parseInt(data.key)){
+          var maxid=parseInt(data.key)+1;
+          //dem++;
+          flag=maxid;
+          insert_noti=database.ref('db_marketsfarmers/table_notif/'+this.props.uidGetMessage);
+          insert_noti.child(maxid).set({
+            idpost:'',
+            content:this.state.txt_noidungtinnhan,
+            state:'dagui',
+            time:time,
+            title:this.state.user_me.hovaten,
+            type:'message'
+          });
+        }
+      });
+
+    });
     insert_message.child(this.props.uidGetMessage)//uid 1 nhận
     .child(this.props.uidSession)//uid 2 gửi
     .push({
@@ -143,9 +166,14 @@ export default class Messendger extends Component{
       seen_1:false,//user 1 đã xem
       seen_2:true,//user 2 đã xem
       sender:2// người gửi 1:uid_1, 2: là uid_2
-    },()=>this.AfterSendMessage());//sau khi gửi
+    },()=>{
+      notification.off('value');
+      this.AfterSendMessage()
+    });//sau khi gửi
+
   }
   AfterSendMessage(){
+
     this.setState({
       txt_noidungtinnhan:'',//sét về mặc định cho inputtext rỗng
     });

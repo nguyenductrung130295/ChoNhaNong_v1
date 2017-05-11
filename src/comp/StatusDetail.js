@@ -1,9 +1,10 @@
 import React ,{Component} from 'react';
-import {AppRegistry,Button,Text,Image,View,ListView,TextInput,TouchableHighlight,ScrollView} from 'react-native';
+import {AppRegistry,Modal,Button,Text,Image,View,ListView,TextInput,TouchableHighlight,ScrollView} from 'react-native';
 import ItemCommand from '../item_customer/ItemCommand';
 import firebase from '../entities/FirebaseAPI';
 import Users from '../entities/Users';
 import Posts from '../entities/Posts';
+import ImageViewer from 'react-native-image-zoom-viewer';
 const ds=new ListView.DataSource({rowHasChanged:(r1,r2) => r1 !== r2});
 export default class StatusDetail extends Component{
   constructor(props){
@@ -19,9 +20,13 @@ export default class StatusDetail extends Component{
       postState:new Posts(),//object Post
       txt_command:'',//noi dung command post
       key:'',//key post current
-      user:new Users(),//state là user mới có thể thay đổi dc
-      user_own:new Users(),//state là user mới có thể thay đổi dc
-
+      user:new Users(),//state là user session có thể thay đổi dc
+      user_own:new Users(),//state là user sở hữu bài đăng có thể thay đổi dc
+      modalImage:false,//modal xem full image
+      imagesModal:[],//mảng chứa hình cho ImageViewer
+      Isfollow:'Theo dõi',//trạng thái đang theo dõi hay không
+      txt_noidungsk:'',//
+      txt_tensukien:'',//
     };
   }
   componentWillMount(){
@@ -29,13 +34,17 @@ export default class StatusDetail extends Component{
     table_hinhs=database.ref('db_marketsfarmers/table_hinhs');
     tb_listposts=database.ref('db_marketsfarmers/table_posts');//trỏ đến chổ table_shops
     var post_hinh=[];
+    var imgArr=[];
     var cmtTam=[];//tạm lưu 1 list cmt hiện tại
     table_hinhs.orderByChild('idpost').equalTo(this.props.idPost)
     .on('value',(snaps)=>{
       snaps.forEach((datahinh)=>{
           post_hinh.push(datahinh.val().linkpost);
+          imgArr.push({
+            url:datahinh.val().linkpost
+          });
       });
-      this.setState({arrayImage:post_hinh,cur_img:0,sum_img:post_hinh.length})
+      this.setState({arrayImage:post_hinh,imagesModal:imgArr,cur_img:0,sum_img:post_hinh.length})
       tb_listposts.orderByChild('idpost')//xếp theo idpost_uid_own
       .equalTo(this.props.idPost)//idpost_uid_own===idpostTam_uidsession
       .on('value',(snapshot)=>{
@@ -221,7 +230,85 @@ export default class StatusDetail extends Component{
     });
   }
   btn_ZoomImage(){
+    this.setState({modalImage:!this.state.modalImage});
+  }
+  btn_TheoDoiPost(){
+    if(this.state.Isfollow!=='Theo dõi'){
+      //theo dõi post
+    var flag=-1;
+    var d = new Date();//new time now
+    var time = d.toString().slice(4,24);//cắt chuỗi thòi gian cần ngày thang năm giờ:phut:giay
+    table_follows=database.ref('db_marketsfarmers/table_posts/'+this.state.key+"/follow");
+    table_follows.orderByKey().limitToLast(1).//once('value')
+  //.then(function(snap) {
+    on('value',(snap)=>{
 
+      snap.forEach((data)=>{
+        console.log(flag+":"+parseInt(data.key));
+        if(flag!==parseInt(data.key)){
+          var maxid=parseInt(data.key)+1;
+          //dem++;
+          flag=maxid;
+          addfollow=database.ref('db_marketsfarmers/table_posts/'+this.state.key+"/follow");
+          addfollow.child(maxid).set({
+            uid_flw:this.props.uidSession,
+            name:this.state.user.hovaten,
+            time:time
+          },()=>{
+            //set thông báo
+            var flag=0;
+            //    console.log(this.state.user_own.uid);
+            notification=database.ref('db_marketsfarmers/table_notif/'+this.state.user_own.uid);
+
+            notification.orderByKey().limitToLast(1).//once('value')
+            //.then(function(snap) {
+            on('value',(snap)=>{
+
+              snap.forEach((data)=>{
+                console.log(flag+":"+parseInt(data.key));
+                if(flag!==parseInt(data.key)){
+                  var maxid=parseInt(data.key)+1;
+                  //dem++;
+                  flag=maxid;
+                  insert_noti=database.ref('db_marketsfarmers/table_notif/'+this.state.user_own.uid);
+                  insert_noti.child(maxid).set({
+                    idpost:this.state.postState.idpost,
+                    content:'đã theo dõi một bài đăng của bạn',
+                    state:'dagui',
+                    time:time,
+                    title:this.state.user.hovaten,
+                    type:'follow'
+                  },()=>{
+                    table_follows.off('value');
+                    notification.off('value');
+                    this.setState({Isfollow:'Bỏ theo dõi'})
+                  });
+                }
+              });
+
+            });
+
+          });
+        }
+      });
+
+    });
+    }
+    else{
+      //bỏ theo dõi
+    }
+
+  }
+  btn_TaoSuKienMoi(){
+    addfollow=database.ref('db_marketsfarmers/table_posts/'+this.state.key+"/events");
+    addfollow.push({
+      batdau:'',
+      ketthuc:'',
+      noidungsk:this.state.txt_noidungsk,
+      tensk:this.state.txt_tensukien,
+      trangthaisk:'',
+    },()=>{
+});
   }
   render(){
     return(
@@ -291,7 +378,11 @@ export default class StatusDetail extends Component{
             </View>
 
               <View style={{flex:2}}>
-                <Button title="Nhắn tin" color="#FFAB00" onPress={()=>this.btn_NhanTin()}></Button>
+              {
+                this.props.uidSession!==this.state.user_own.uid ?
+                  <Button title={this.state.Isfollow} color="#FFAB00" onPress={()=>this.btn_TheoDoiPost()}></Button>
+                : null
+              }
               </View>
             </View>
 
@@ -322,6 +413,12 @@ export default class StatusDetail extends Component{
 
       </View>
 </ScrollView>
+<Modal visible={this.state.modalImage}
+transparent={true}
+onRequestClose={() => alert("Modal has been closed.")}>
+                <ImageViewer imageUrls={this.state.imagesModal}
+                onDoubleClick={()=>this.setState({modalImage:!this.state.modalImage})}/>
+            </Modal>
       </View>
     );
   }
@@ -329,6 +426,9 @@ export default class StatusDetail extends Component{
     if(this.state.show===true){
     return(
       <View style={{backgroundColor:'#EEEEEE'}}>
+      <View style={{height:1,backgroundColor:'#9E9E9Ed4',margin:10}}></View>
+      <Text>Thông tin người "Bán"</Text>
+      {this.props.uidSession!==this.state.user_own.uid ?<Button title="Nhắn tin" color="#FFAB00" onPress={()=>this.btn_NhanTin()}></Button>:null}
       <View style={{height:1,backgroundColor:'#9E9E9Ed4',margin:10}}></View>
       <View style={{flexDirection:'row',marginTop:5,marginLeft:10,marginRight:10}}>
         <Image source={require('../img/icondefault.jpg')} style={{width:25,height:25,borderRadius:100}}/>
@@ -347,11 +447,21 @@ export default class StatusDetail extends Component{
         <Image source={require('../img/mobile-phone.png')} style={{width:25,height:25,borderRadius:100}}/>
         <Text style={{color:'black',marginLeft:5}}>{this.state.user_own.sdt}</Text>
       </View>
+      <View style={{height:1,backgroundColor:'#9E9E9Ed4',margin:10}}></View>
+      <Text>Danh sách sự kiện</Text>
+      {this.props.uidSession===this.state.user_own.uid?<Button title="Tạo sự kiện mới" color="#FFAB00" onPress={()=>this.btn_TaoSuKienMoi()}></Button>:null}
+
+      <View style={{height:1,backgroundColor:'#9E9E9Ed4',margin:10}}></View>
+      <View style={{flexDirection:'row',marginTop:5,marginLeft:10,marginRight:10}}>
+        <Image source={require('../img/mobile-phone.png')} style={{width:25,height:25,borderRadius:100}}/>
+        <Text style={{color:'black',marginLeft:5}}>{this.state.user_own.sdt}</Text>
+      </View>
       {/* button expand */}
       <View style={{marginTop:5,justifyContent:'center',flexDirection:'row',borderWidth:1,borderColor:'#BDBDBD',backgroundColor:'#BDBDBD'}}>
          <TouchableHighlight  onPress={()=>this.setState({show:false})}>
           <Image source={require('../img/ic_expand_less_black_24dp.png')} style={{width:25,height:25}}/>
          </TouchableHighlight>
+         <Text style={{color:'black'}}>Thu gọn</Text>
        </View>
        </View>
     );
@@ -359,6 +469,7 @@ export default class StatusDetail extends Component{
     else {
       return(
         <View style={{justifyContent:'center',flexDirection:'row',borderWidth:1,borderColor:'#BDBDBD',backgroundColor:'#BDBDBD'}}>
+            <Text style={{color:'black'}}>Xem thêm</Text>
            <TouchableHighlight onPress={()=>this.setState({show:true})}>
             <Image source={require('../img/ic_expand_more_black_24dp.png')} style={{width:25,height:25}}/>
            </TouchableHighlight>

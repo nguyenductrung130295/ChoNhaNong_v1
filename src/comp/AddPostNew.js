@@ -97,7 +97,14 @@ export default class AddPostNew extends Component{
       idpost_uid_own:idp+"_"+this.props.uidSession,
       command:{
         0:{
-          defaul:'honggnuhnhuynhneyugn',          
+          defaul:'honggnuhnhuynhneyugn',
+        }
+      },
+      follow:{
+        0:{
+          uid:'uid',
+          name:'hovaten',
+          timefollow:'9859485273958'
         }
       }
 

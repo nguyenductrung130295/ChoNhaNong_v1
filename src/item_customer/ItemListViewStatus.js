@@ -3,7 +3,6 @@ import {AppRegistry,View,Text,TouchableHighlight,Picker,Button,Image} from 'reac
 export default class ItemListViewStatus extends Component{
   constructor(props){
     super(props);
-
   }
 
   render(){

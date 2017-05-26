@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import {Platform,AsyncStorage,AppRegistry,View,
+import {Platform,StatusBar,AsyncStorage,AppRegistry,View,
   Modal,Text,TextInput,Item,TouchableHighlight,Picker,PickerIOS,Button,Image,ListView} from 'react-native';
 import ItemListViewStatus from '../item_customer/ItemListViewStatus';
 import Users from '../entities/Users'
@@ -59,7 +59,7 @@ export default class GuestMain extends Component{
       selected2:'Trái cây',
       selected3:'Hồ Chí Minh',
       user:new Users(),//state là user mới có thể thay đổi dc
-
+      txt_search:'',//input search
     };
 
 
@@ -154,18 +154,18 @@ export default class GuestMain extends Component{
       });
       this.RunNotification(this.props.uidSession);
     }
-    idpostTam=' ';//post tạm để nếu post đó đã có thì ko lấy nữa
-    table_hinhs=database.ref('db_marketsfarmers/table_hinhs');
+    //data
+    this.RetriveDataPost();
+
+  }
+  RetriveDataPost(){
     tb_listposts=database.ref('db_marketsfarmers/table_posts');//trỏ đến chổ table_shops
-    var postTam=[];//tạm lưu 1 post hiện tại
-    table_hinhs.orderByChild('idpost')//xếp theo idpost trong table_hinhs
-    .on('value',(snaps)=>{
-      snaps.forEach((datahinh)=>{
-        if(datahinh.val().idpost!==idpostTam){//idpost mới
-          idpostTam=datahinh.val().idpost;//gán vào để phân biệt post khác
-          tb_listposts//.orderByChild('idpost_uid_own')//xếp theo idpost_uid_own
+    var postTam=[];//tạm lưu 1 post hiện tạis   s
+          tb=tb_listposts.orderByChild('tieude').startAt(this.state.txt_search).endAt(this.state.txt_search+'\uf8ff')//xếp theo idpost_uid_own
+          //.orderByChild('idpost')//xếp theo idpost_uid_own
           //.equalTo(idpostTam+"_"+this.props.uidSession)//idpost_uid_own===idpostTam_uidsession
           .on('value',(snapshot)=>{
+
             snapshot.forEach((data)=>{
               flag=0;//chưa tồn tại post trong list
 
@@ -178,20 +178,36 @@ export default class GuestMain extends Component{
                   postTam[i].loaitien=data.val().loaitien;
                   postTam[i].thoigiandang=data.val().thoigiandang;
                   postTam[i].tieude=data.val().tieude;
-                  postTam[i].linkhinh=datahinh.val().linkpost;
+                  //postTam[i].linkhinh=datahinh.val().linkpost;
                   flag=1;//báo có tồn tại
+                  table_hinhs=database.ref('db_marketsfarmers/table_posts/'+data.key+'/images/');
+                  table_hinhs.limitToFirst(1).on('value',(snapHinh)=>{
+                    snapHinh.forEach((datahinh)=>{
+                      //alert(datahinh.val().linkpost);
+                      postTam[i].linkhinh=datahinh.val().linkpost;
+                    });
+                  });
+
                 }
               }
+              //console.log(datahinh.val().linkpost);
               if(flag===0){//không tồn tại, thêm mới post vào
-                postTam.push({
-                  idpost:data.val().idpost,
-                  diachi_t:data.val().diachi_t,
-                  giaban:data.val().giaban,
-                  loaitien:data.val().loaitien,
-                  thoigiandang:data.val().thoigiandang,
-                  tieude:data.val().tieude,
-                  linkhinh:datahinh.val().linkpost
+                table_hinhs=database.ref('db_marketsfarmers/table_posts/'+data.key+'/images/');
+                table_hinhs.limitToFirst(1).on('value',(snapHinh)=>{
+                  snapHinh.forEach((datahinh)=>{
+                    //alert(datahinh.val().linkpost);
+                    postTam.push({
+                      idpost:data.val().idpost,
+                      diachi_t:data.val().diachi_t,
+                      giaban:data.val().giaban,
+                      loaitien:data.val().loaitien,
+                      thoigiandang:data.val().thoigiandang,
+                      tieude:data.val().tieude,
+                      linkhinh:datahinh.val().linkpost
+                    });
+                  });
                 });
+
               }
 
             });
@@ -199,9 +215,6 @@ export default class GuestMain extends Component{
             this.setState({dataSource:ds.cloneWithRows(postTam)});
             //alert(this.state.dataSource.length);
           });
-        }
-      });
-});
 
 
   }
@@ -421,7 +434,11 @@ export default class GuestMain extends Component{
         <View style={{flexDirection:'row'}}>
           <View style={{flex:7,paddingLeft:5}}>
 {/* SEARCH INPUT */}
-          <TextInput underlineColorAndroid="#29b6f6" style={{color:'white',borderColor:'#81D4FA',borderWidth:1,backgroundColor:'#29b6f6',borderRadius:5,height:38,fontSize:15,marginTop:5}} returnKeyType={'search'} placeholder="  search" onSubmitEditing={()=>this.btn_TimKiem_Click()}/>
+          <TextInput underlineColorAndroid="#29b6f6"
+           style={{color:'white',borderColor:'#81D4FA',borderWidth:1,backgroundColor:'#29b6f6',borderRadius:5,height:38,fontSize:15,marginTop:5}}
+            returnKeyType={'search'} placeholder="  search"
+            onChangeText={(value)=>this.setState({txt_search:value})}
+           onSubmitEditing={()=>this.btn_TimKiem_Click()}/>
           </View>
 {/* ICON BUTTON SEARCH */}
           <View style={{flex:1}}><TouchableHighlight underlayColor='#E0F7FA' onPress={()=>this.btn_TimKiem_Click()} style={{width:40,height:40,marginTop:5,borderRadius:20}}><Image source={require('../img/ic_search_white_24dp.png')} /></TouchableHighlight></View>
@@ -446,7 +463,11 @@ export default class GuestMain extends Component{
           <View style={{flex:1}}><TouchableHighlight underlayColor='#E0F7FA' onPress={()=>this.btn_Menu_Click()} style={{width:40,height:40,marginTop:5,borderRadius:20}}><Image source={require('../img/ic_reorder_white_24dp.png')} /></TouchableHighlight></View>
           <View style={{flex:7,paddingLeft:5}}>
 {/* SEARCH INPUT */}
-          <TextInput underlineColorAndroid="#29b6f6" style={{color:'white',borderColor:'#81D4FA',borderWidth:1,backgroundColor:'#29b6f6',borderRadius:5,height:38,fontSize:15,marginTop:5}} returnKeyType={'search'} placeholder="  search" onSubmitEditing={()=>this.btn_TimKiem_Click()}/>
+          <TextInput underlineColorAndroid="#29b6f6"
+          onChangeText={(value)=>this.setState({txt_search:value})}
+          style={{color:'white',borderColor:'#81D4FA',borderWidth:1,backgroundColor:'#29b6f6',borderRadius:5,height:38,fontSize:15,marginTop:5}}
+          returnKeyType={'search'} placeholder="  search"
+          onSubmitEditing={()=>this.btn_TimKiem_Click()}/>
           </View>
 {/* ICON BUTTON SEARCH */}
           <View style={{flex:1}}><TouchableHighlight underlayColor='#E0F7FA' onPress={()=>this.btn_TimKiem_Click()} style={{width:40,height:40,marginTop:5,borderRadius:20}}><Image source={require('../img/ic_search_white_24dp.png')} /></TouchableHighlight></View>
@@ -552,6 +573,10 @@ export default class GuestMain extends Component{
 
     return(
       <View style={{backgroundColor:'#E0E0E0',flex:1}}>
+      <StatusBar
+     backgroundColor="#0288D1"
+     barStyle="light-content"
+   />
 {this.Logined(this)}
 
       <ListView
@@ -579,11 +604,14 @@ export default class GuestMain extends Component{
     });
   }
   btn_TimKiem_Click(){
+    this.setState({dataSource:ds.cloneWithRows([])});
+    this.RetriveDataPost();
     //alert('button Tim Kiem is clicked');
+    /*
     PushNotification.localNotification({
       title: "My Notification Title", // (optional, for iOS this is only used in apple watch, the title will be the app name on other iOS devices)
     message: "My Notification Message", // (required)
-      });
+  });*/
   }
   btn_Menu_Click(){
     this.setModalVisible(true);

@@ -46,56 +46,61 @@ export default class InfoPersonal extends Component{
         alert('firebase error');
       }
   });
-  idpostTam=' ';//post tạm để nếu post đó đã có thì ko lấy nữa
-  table_hinhs=database.ref('db_marketsfarmers/table_hinhs');
   tb_listposts=database.ref('db_marketsfarmers/table_posts');//trỏ đến chổ table_shops
   var postTam=[];//tạm lưu 1 post hiện tại
-  table_hinhs.orderByChild('idpost')//xếp theo idpost trong table_hinhs
-  .on('value',(snaps)=>{
-    snaps.forEach((datahinh)=>{
-      if(datahinh.val().idpost!==idpostTam){//idpost mới
-        idpostTam=datahinh.val().idpost;//gán vào để phân biệt post khác
-        tb_listposts.orderByChild('idpost_uid_own')//xếp theo idpost_uid_own
-        .equalTo(idpostTam+"_"+this.props.uidSession)//idpost_uid_own===idpostTam_uidsession
+
+        tb_listposts.orderByChild('uid_own')//xếp theo idpost_uid_own
+        .equalTo(this.props.uidSession)//idpost_uid_own===idpostTam_uidsession
         .on('value',(snapshot)=>{
           snapshot.forEach((data)=>{
-            if(data.val().idshop_own==='null'){//của user đăng
-              flag=0;//chưa tồn tại post trong list
-              for(let i=0;i<postTam.length;i++){
-                if(postTam[i].idpost===data.val().idpost){
-                  //có tồn tại rồi, update lại thôi
-                  postTam[i].idpost=data.val().idpost;
-                  postTam[i].diachi_t=data.val().diachi_t;
-                  postTam[i].giaban=data.val().giaban;
-                  postTam[i].loaitien=data.val().loaitien;
-                  postTam[i].thoigiandang=data.val().thoigiandang;
-                  postTam[i].tieude=data.val().tieude;
-                  postTam[i].linkhinh=datahinh.val().linkpost;
-                  flag=1;//báo có tồn tại
-                }
-              }
-              if(flag===0){//không tồn tại, thêm mới post vào
-                postTam.push({
-                  idpost:data.val().idpost,
-                  diachi_t:data.val().diachi_t,
-                  giaban:data.val().giaban,
-                  loaitien:data.val().loaitien,
-                  thoigiandang:data.val().thoigiandang,
-                  tieude:data.val().tieude,
-                  linkhinh:datahinh.val().linkpost
+            flag=0;//chưa tồn tại post trong list
+
+            for(let i=0;i<postTam.length;i++){
+              if(postTam[i].idpost===data.val().idpost){
+                //có tồn tại rồi, update lại thôi
+                postTam[i].idpost=data.val().idpost;
+                postTam[i].diachi_t=data.val().diachi_t;
+                postTam[i].giaban=data.val().giaban;
+                postTam[i].loaitien=data.val().loaitien;
+                postTam[i].thoigiandang=data.val().thoigiandang;
+                postTam[i].tieude=data.val().tieude;
+                //postTam[i].linkhinh=datahinh.val().linkpost;
+                flag=1;//báo có tồn tại
+                table_hinhs=database.ref('db_marketsfarmers/table_posts/'+data.key+'/images/');
+                table_hinhs.limitToFirst(1).on('value',(snapHinh)=>{
+                  snapHinh.forEach((datahinh)=>{
+                    //alert(datahinh.val().linkpost);
+                    postTam[i].linkhinh=datahinh.val().linkpost;
+                  });
                 });
+
               }
             }
+            //console.log(datahinh.val().linkpost);
+            if(flag===0){//không tồn tại, thêm mới post vào
+              table_hinhs=database.ref('db_marketsfarmers/table_posts/'+data.key+'/images/');
+              table_hinhs.limitToFirst(1).on('value',(snapHinh)=>{
+                snapHinh.forEach((datahinh)=>{
+                  //alert(datahinh.val().linkpost);
+                  postTam.push({
+                    idpost:data.val().idpost,
+                    diachi_t:data.val().diachi_t,
+                    giaban:data.val().giaban,
+                    loaitien:data.val().loaitien,
+                    thoigiandang:data.val().thoigiandang,
+                    tieude:data.val().tieude,
+                    linkhinh:datahinh.val().linkpost
+                  });
+                });
+              });
 
+            }
 
           });
           //thêm vào datasource cho listView in ra
           this.setState({dataSource:ds.cloneWithRows(postTam)});
           //alert(this.state.dataSource.length);
         });
-      }
-    });
-    });
   }
 
   yesImg(){

@@ -1,16 +1,22 @@
 import React ,{Component} from 'react';
-import {AppRegistry,Modal,Button,Text,Image,View,ListView,TextInput,TouchableHighlight,ScrollView} from 'react-native';
+import {AppRegistry,Picker,Modal,Button,Text,Image,View,ListView,TextInput,TouchableHighlight,ScrollView} from 'react-native';
 import ItemCommand from '../item_customer/ItemCommand';
 import firebase from '../entities/FirebaseAPI';
 import Users from '../entities/Users';
 import Posts from '../entities/Posts';
 import ImageViewer from 'react-native-image-zoom-viewer';
+import DateTimePicker from 'react-native-modal-datetime-picker';
 const ds=new ListView.DataSource({rowHasChanged:(r1,r2) => r1 !== r2});
 export default class StatusDetail extends Component{
   constructor(props){
     super(props);
 
     this.state={
+      isDateTimePickerVisiblebd: false,//cho cái chọn ngày thời gian ẩn hiện
+      isDateTimePickerVisiblekt: false,//cho cái chọn ngày thời gian ẩn hiện
+      datedb:'bắt đầu',//ngày sự kiện bắt đầu
+      datekt:'kết thúc',//ngày sự  kiện kết thúc
+      modalVisible: false,//ẩn hiện modal tạo cửa hàng mới
       dataSource:ds.cloneWithRows([]),
       cur_img:-1,// thứ tự image dang hien trong cái xem hinh ở trên màn hình
       sum_img:0,//tổng image trong arrayImage
@@ -27,6 +33,7 @@ export default class StatusDetail extends Component{
       Isfollow:'Theo dõi',//trạng thái đang theo dõi hay không
       txt_noidungsk:'',//
       txt_tensukien:'',//
+      dataSourceEvent:ds.cloneWithRows([]),
     };
   }
   componentWillMount(){
@@ -109,6 +116,24 @@ export default class StatusDetail extends Component{
                     alert('firebase error');
                   }
               });
+//listview danh sách sự kiện
+              tb_sk=database.ref('db_marketsfarmers/table_posts/'+data.key+'/events');//data.key-->idpost
+              var tam_event=[];
+              tb_sk.on('value',(snap)=>{
+                snap.forEach((dataevent)=>{
+                  //alert(dataevent.val().tensk);
+                  tam_event.push({
+                    idsukien:dataevent.key,
+                    tensukien:dataevent.val().tensk,
+                    thoigianbatdau:dataevent.val().batdau,
+                    thoigianketthuc:dataevent.val().ketthuc,
+                    noidungsukien:dataevent.val().nodungsk,
+                    trangthaisk:dataevent.val().trangthaisk
+                  })
+                });
+                this.setState({dataSourceEvent:ds.cloneWithRows(tam_event)});
+              });
+
         });
       });
       });
@@ -135,7 +160,8 @@ export default class StatusDetail extends Component{
             alert('firebase error');
           }
       });
-  }
+
+}
   btn_PreviousImage(){
     if(this.state.sum_img>0 && (this.state.cur_img > 0)){
       this.setState({
@@ -300,16 +326,18 @@ export default class StatusDetail extends Component{
 
   }
   btn_TaoSuKienMoi(){
+    this.setState({modalVisible:!this.state.modalVisible});
     addfollow=database.ref('db_marketsfarmers/table_posts/'+this.state.key+"/events");
+
     addfollow.push({
-      batdau:'',
-      ketthuc:'',
+      batdau:this.state.datebd,
+      ketthuc:this.state.datekt,
       noidungsk:this.state.txt_noidungsk,
       tensk:this.state.txt_tensukien,
       trangthaisk:'',
-    },()=>{
-});
+    });
   }
+
   render(){
     return(
       <View>
@@ -413,11 +441,76 @@ export default class StatusDetail extends Component{
 
       </View>
 </ScrollView>
+
 <Modal visible={this.state.modalImage}
 transparent={true}
 onRequestClose={() => alert("Modal has been closed.")}>
                 <ImageViewer imageUrls={this.state.imagesModal}
                 onDoubleClick={()=>this.setState({modalImage:!this.state.modalImage})}/>
+            </Modal>
+            <Modal
+              animationType={"slide"}
+              transparent={true}
+              visible={this.state.modalVisible}
+              onRequestClose={() => alert("Modal has been closed.")}
+              >
+             <View style={{flex:1,backgroundColor:'#000000a0'}}>
+              <View style={{flex:1}}></View>
+              <View style={{flex:2}}>
+              <View style={{margin:20,backgroundColor:'white',borderRadius:5}}>
+              <View style={{flexDirection:'row',backgroundColor:'#0288D1'}}>
+                <View style={{flex:7}}>
+                  <Text style={{fontSize:20,color:'white',marginLeft:10,marginTop:10}}>Tạo Sự kiện mới</Text>
+                </View>
+                <View style={{flex:1}}>
+                  <TouchableHighlight underlayColor='#E0F7FA' onPress={() => {
+                    this.setState({modalVisible:!this.state.modalVisible})
+                  }} style={{width:40,height:40,marginTop:5,borderRadius:20}}><Image source={require('../img/ic_clear_white_24dp.png')} /></TouchableHighlight>
+                </View>
+              </View>
+
+                  <View style={{padding: 10}}>
+            <TextInput
+              style={{color:'black',height: 40,marginBottom:10,borderColor:'#BDBDBD',borderWidth:1,borderRadius:2}}
+              underlineColorAndroid="white"
+              placeholder="Tên sự kiện"
+              onChangeText={(value)=>this.setState({txt_tensukien:value})}
+              />
+              <TextInput
+                style={{color:'black',height: 40,marginBottom:10,borderColor:'#BDBDBD',borderWidth:1,borderRadius:2}}
+                underlineColorAndroid="white"
+                placeholder="nội dung"
+                onChangeText={(value)=>this.setState({txt_noidungsk:value})}
+                />
+                <View style={{flexDirection:'row',marginBottom:10}}>
+                  <View style={{flex:1,paddingRight:5}}>
+                    <Button onPress={()=>this.setState({ isDateTimePickerVisiblebd: true })}
+                    title={this.state.datebd+" "} color='#BDBDBD'></Button>
+                  </View>
+                  <View style={{flex:1,paddingLeft:5}}>
+                  {/* picker loại sp cúả cửa hàng*/}
+                    <Button onPress={()=>this.setState({ isDateTimePickerVisiblekt: true })}
+                    title={this.state.datekt+" "} color='#BDBDBD'></Button>
+                  </View>
+                </View>
+                <Button onPress={()=>this.btn_TaoSuKienMoi()} title={'Tạo'} color='#03A9F4'></Button>
+          </View>
+          </View>
+              </View>
+              <View style={{flex:1}}></View>
+             </View>
+             <DateTimePicker
+                       isVisible={this.state.isDateTimePickerVisiblebd}
+                       onConfirm={(date_bd)=>this.setState({datebd:date_bd.toString().slice(4,21),isDateTimePickerVisiblebd:!this.state.isDateTimePickerVisiblebd})}
+                       onCancel={()=>this.setState({isDateTimePickerVisiblebd:!this.state.isDateTimePickerVisiblebd})}
+                       mode={'datetime'}
+                     />
+                     <DateTimePicker
+                               isVisible={this.state.isDateTimePickerVisiblekt}
+                               onConfirm={(date_kt)=>this.setState({datekt:date_kt.toString().slice(4,21),isDateTimePickerVisiblekt:!this.state.isDateTimePickerVisiblekt})}
+                               onCancel={()=>this.setState({isDateTimePickerVisiblekt:!this.state.isDateTimePickerVisiblekt})}
+                               mode={'datetime'}
+                             />
             </Modal>
       </View>
     );
@@ -449,7 +542,21 @@ onRequestClose={() => alert("Modal has been closed.")}>
       </View>
       <View style={{height:1,backgroundColor:'#9E9E9Ed4',margin:10}}></View>
       <Text>Danh sách sự kiện</Text>
-      {this.props.uidSession===this.state.user_own.uid?<Button title="Tạo sự kiện mới" color="#FFAB00" onPress={()=>this.btn_TaoSuKienMoi()}></Button>:null}
+      <ListView
+      dataSource={this.state.dataSourceEvent}
+      enableEmptySections={true}
+      renderRow={(rowData)=><View style={{flexDirection:'row'}}>
+      <View style={{flext:1,color:'black',paddingLeft:10  }}>
+        <Text>{rowData.thoigianbatdau.slice(0,17)}</Text>
+      </View>
+        <View style={{flext:2,paddingLeft:10,color:'black'}}>
+          <Text>{rowData.tensukien}</Text>
+        </View></View>}
+      />
+
+
+      {this.props.uidSession===this.state.user_own.uid?
+        <Button title="Tạo sự kiện mới" color="#FFAB00" onPress={()=>this.setState({datebd:'bắt đầu',datekt:'kết thúc',modalVisible:true})}></Button>:null}
 
       <View style={{height:1,backgroundColor:'#9E9E9Ed4',margin:10}}></View>
       <View style={{flexDirection:'row',marginTop:5,marginLeft:10,marginRight:10}}>

@@ -104,43 +104,55 @@ export default class AddPostNew extends Component{
         0:{
           uid:'uid',
           name:'hovaten',
-          timefollow:'9859485273958'
+          timefollow:'0963832177'
         }
       }
 
     },()=>{
-      //trỏ tới table_post
-      table_hinhs=database.ref('db_marketsfarmers/table_hinhs');
-      //upload danh sách hình vào
-      arrayTam=[];//mảng này để lưu id hình mới tạo
-
-      i=0;// id hình lỡ 2 hình cùng id
-      for(let i=0;i<this.state.arrayImage.length;i++){
-
-        //tạo tên mới theo thời gian quá haya
-        var d = new Date();
-        var n = d.toISOString();
-        var a,b,c,d1;
-        a=n.slice(0,12);
-        b=n.slice(14,16);
-        c=n.slice(17,19);
-        d1=n.slice(20,24);
-        n=a+b+c+d1;//tên file mới
+      postnew=database.ref('db_marketsfarmers/table_posts');
+      postnew.orderByChild('idpost').equalTo(idp).on('value',(snapshot)=>{
+        snapshot.forEach((data)=>{
+          //trỏ tới table_post
+          table_hinhs=database.ref('db_marketsfarmers/table_posts/'+data.key+'/images');
+          //upload danh sách hình vào
 
 
-          //cái hàm uploadImage này là nó upload cái hình tại đường dẫn Path tên
-        uploadImage(this.state.arrayImage[i],n+".jpg").then((responseData)=>{
-          i++;
-          //mỗi lần upload 1 file lên sẽ trả về link URI image của
-          //ảnh đó về chứa trong responseData
-          table_hinhs.push({
-            idhinh:n+i,
-            linkpost:responseData,
-            idpost:idp
-          },()=>arrayTam.push(n+i));//lưu id hình mới tạo
-        }).done();
-        //console.log(this.state.arrayImage[i]);
-      }
+          i=0;// id hình lỡ 2 hình cùng id
+          for(let i=0;i<this.state.arrayImage.length;i++){
+//alert(i);
+            //tạo tên mới theo thời gian quá haya
+            var d = new Date();
+            var n = d.toISOString();
+            var a,b,c,d1;
+            a=n.slice(0,12);
+            b=n.slice(14,16);
+            c=n.slice(17,19);
+            d1=n.slice(20,24);
+            n=a+b+c+d1;//tên file mới
+
+            flat=false;
+              //cái hàm uploadImage này là nó upload cái hình tại đường dẫn Path tên
+            uploadImage(this.state.arrayImage[i],n+".jpg").then((responseData)=>{
+              //i++;
+              //mỗi lần upload 1 file lên sẽ trả về link URI image của
+              //ảnh đó về chứa trong responseData
+
+              if(flat===false){
+                table_hinhs.push({
+                  idhinh:n,
+                  linkpost:responseData
+                },()=>{
+                  flat=true;
+                  //postnew.off('value');
+                });
+              }
+              //lưu id hình mới tạo
+            }).done();
+            //console.log(this.state.arrayImage[i]);
+          }
+        });
+      });
+
     });
 
 

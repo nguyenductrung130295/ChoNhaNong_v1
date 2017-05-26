@@ -69,17 +69,11 @@ export default class ShopMain extends Component{
       }
   });
 
-  idpostTam=' ';//post tạm để nếu post đó đã có thì ko lấy nữa
-  table_hinhs=database.ref('db_marketsfarmers/table_hinhs');
   tb_listposts=database.ref('db_marketsfarmers/table_posts');//trỏ đến chổ table_shops
   var postTam=[];//tạm lưu 1 post hiện tại
-  table_hinhs.orderByChild('idpost')//xếp theo idpost trong table_hinhs
-  .on('value',(snaps)=>{
-    snaps.forEach((datahinh)=>{
-      if(datahinh.val().idpost!==idpostTam){//idpost mới
-        idpostTam=datahinh.val().idpost;//gán vào để phân biệt post khác
+
         tb_listposts.orderByChild('idshop_own')//xếp theo idpost_uid_own
-        .equalTo(this.props.sid)//===idshop_own?
+        .equalTo(this.props.sid)//idpost_uid_own===idpostTam_uidsession
         .on('value',(snapshot)=>{
           snapshot.forEach((data)=>{
             flag=0;//chưa tồn tại post trong list
@@ -93,20 +87,36 @@ export default class ShopMain extends Component{
                 postTam[i].loaitien=data.val().loaitien;
                 postTam[i].thoigiandang=data.val().thoigiandang;
                 postTam[i].tieude=data.val().tieude;
-                postTam[i].linkhinh=datahinh.val().linkpost;
+                //postTam[i].linkhinh=datahinh.val().linkpost;
                 flag=1;//báo có tồn tại
+                table_hinhs=database.ref('db_marketsfarmers/table_posts/'+data.key+'/images/');
+                table_hinhs.limitToFirst(1).on('value',(snapHinh)=>{
+                  snapHinh.forEach((datahinh)=>{
+                    //alert(datahinh.val().linkpost);
+                    postTam[i].linkhinh=datahinh.val().linkpost;
+                  });
+                });
+
               }
             }
+            //console.log(datahinh.val().linkpost);
             if(flag===0){//không tồn tại, thêm mới post vào
-              postTam.push({
-                idpost:data.val().idpost,
-                diachi_t:data.val().diachi_t,
-                giaban:data.val().giaban,
-                loaitien:data.val().loaitien,
-                thoigiandang:data.val().thoigiandang,
-                tieude:data.val().tieude,
-                linkhinh:datahinh.val().linkpost
+              table_hinhs=database.ref('db_marketsfarmers/table_posts/'+data.key+'/images/');
+              table_hinhs.limitToFirst(1).on('value',(snapHinh)=>{
+                snapHinh.forEach((datahinh)=>{
+                  //alert(datahinh.val().linkpost);
+                  postTam.push({
+                    idpost:data.val().idpost,
+                    diachi_t:data.val().diachi_t,
+                    giaban:data.val().giaban,
+                    loaitien:data.val().loaitien,
+                    thoigiandang:data.val().thoigiandang,
+                    tieude:data.val().tieude,
+                    linkhinh:datahinh.val().linkpost
+                  });
+                });
               });
+
             }
 
           });
@@ -114,9 +124,6 @@ export default class ShopMain extends Component{
           this.setState({dataSource:ds.cloneWithRows(postTam)});
           //alert(this.state.dataSource.length);
         });
-      }
-    });
-  });
   }
   setModalVisible1(visible) {
     this.setState({modalVisible1:visible});
@@ -141,19 +148,20 @@ export default class ShopMain extends Component{
       <View style={{flex:1}}>
         <View style={{flex:1}}>
           <Image style={{width:'100%',height:'100%'}}
-          source={{uri:this.state.shop.anhbiashop}}>
+            source={{uri:this.state.shop.anhbiashop}}>
           <View style={{flexDirection:'row',backgroundColor:'#00000030'}}>
-<View style={{flex:1}}><TouchableHighlight underlayColor='pink' onPress={()=>this.btn_Back_Click()}>
-<Image source={require('../img/ic_arrow_back_white_24dp.png')} style={{width:40,height:40,marginTop:5}}/>
-</TouchableHighlight></View>
-          <View style={{flex:5}}>
-          </View>
-          <View style={{flex:1}}><TouchableHighlight underlayColor='pink' onPress={()=>this.btn_Event_Click()}>
-          <Image source={require('../img/ic_event_white_24dp.png')} style={{width:40,height:40,marginTop:5}}/>
-          </TouchableHighlight></View>
-          <View style={{flex:1}}><TouchableHighlight underlayColor='pink' onPress={()=>this.btn_SendMessage_Click()}>
-          <Image source={require('../img/ic_message_white_24dp.png')} style={{width:40,height:40,marginTop:5}}/>
-          </TouchableHighlight></View>
+            <View style={{flex:1}}>
+              <TouchableHighlight underlayColor='pink' onPress={()=>this.btn_Back_Click()}>
+                <Image source={require('../img/ic_arrow_back_white_24dp.png')} style={{width:40,height:40,marginTop:5}}/>
+              </TouchableHighlight></View>
+            <View style={{flex:5}}>
+            </View>
+            <View style={{flex:1}}><TouchableHighlight underlayColor='pink' onPress={()=>this.btn_Event_Click()}>
+              <Image source={require('../img/ic_event_white_24dp.png')} style={{width:40,height:40,marginTop:5}}/>
+            </TouchableHighlight></View>
+            <View style={{flex:1}}><TouchableHighlight underlayColor='pink' onPress={()=>this.btn_SendMessage_Click()}>
+              <Image source={require('../img/ic_message_white_24dp.png')} style={{width:40,height:40,marginTop:5}}/>
+            </TouchableHighlight></View>
           </View>
             <View style={{flexDirection:'row'}}>
               <View style={{flex:3}}>
